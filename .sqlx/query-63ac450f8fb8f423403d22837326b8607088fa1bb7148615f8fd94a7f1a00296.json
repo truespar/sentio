@@ -1,0 +1,95 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id, domain_id, tenant_id, address, display_name, status, forward_to, auto_reply, auto_reply_subject, auto_reply_body, metadata, created_at, updated_at FROM mailboxes WHERE domain_id = $1 AND lower(address) = lower($2) AND status = 'active' LIMIT 1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "domain_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "address",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "display_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "status",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "forward_to",
+        "type_info": "TextArray"
+      },
+      {
+        "ordinal": 7,
+        "name": "auto_reply",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 8,
+        "name": "auto_reply_subject",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 9,
+        "name": "auto_reply_body",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 10,
+        "name": "metadata",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 11,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 12,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      true,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "63ac450f8fb8f423403d22837326b8607088fa1bb7148615f8fd94a7f1a00296"
+}

@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM oauth_authorization_codes WHERE expires_at < now()",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": []
+  },
+  "hash": "2a4f2aa3abebf45b88cead3a5b9c99a61e0fda3d53dae69eb9be05f664006b5e"
+}

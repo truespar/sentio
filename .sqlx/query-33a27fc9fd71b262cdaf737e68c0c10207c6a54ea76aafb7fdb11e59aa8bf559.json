@@ -1,0 +1,196 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id, tenant_id, domain_id, direction, envelope_from, envelope_to, header_from, header_to, header_cc, header_reply_to, subject, message_id_header, status, tags, metadata, message_size, raw_eml_key, spam_score, spam_action, send_at, dsn_ret, dsn_envid, dsn_notify, dsn_orcpt, created_at, delivered_at, bounced_at, llm_category, llm_summary, llm_classified_at FROM messages WHERE id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "domain_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "direction",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "envelope_from",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "envelope_to",
+        "type_info": "TextArray"
+      },
+      {
+        "ordinal": 6,
+        "name": "header_from",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "header_to",
+        "type_info": "TextArray"
+      },
+      {
+        "ordinal": 8,
+        "name": "header_cc",
+        "type_info": "TextArray"
+      },
+      {
+        "ordinal": 9,
+        "name": "header_reply_to",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 10,
+        "name": "subject",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 11,
+        "name": "message_id_header",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 12,
+        "name": "status",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 13,
+        "name": "tags",
+        "type_info": "TextArray"
+      },
+      {
+        "ordinal": 14,
+        "name": "metadata",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 15,
+        "name": "message_size",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 16,
+        "name": "raw_eml_key",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 17,
+        "name": "spam_score",
+        "type_info": "Float8"
+      },
+      {
+        "ordinal": 18,
+        "name": "spam_action",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 19,
+        "name": "send_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 20,
+        "name": "dsn_ret",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 21,
+        "name": "dsn_envid",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 22,
+        "name": "dsn_notify",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 23,
+        "name": "dsn_orcpt",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 24,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 25,
+        "name": "delivered_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 26,
+        "name": "bounced_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 27,
+        "name": "llm_category",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 28,
+        "name": "llm_summary",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 29,
+        "name": "llm_classified_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "33a27fc9fd71b262cdaf737e68c0c10207c6a54ea76aafb7fdb11e59aa8bf559"
+}

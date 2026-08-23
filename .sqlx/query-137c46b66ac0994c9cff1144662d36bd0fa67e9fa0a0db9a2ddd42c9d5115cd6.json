@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE domains SET use_for_sending = $1, use_for_receiving = $2, reject_unknown_recipients = $3 WHERE id = $4",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Bool",
+        "Bool",
+        "Bool",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "137c46b66ac0994c9cff1144662d36bd0fa67e9fa0a0db9a2ddd42c9d5115cd6"
+}

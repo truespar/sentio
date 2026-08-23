@@ -1,0 +1,102 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO mailboxes (domain_id, tenant_id, address, display_name, forward_to, auto_reply, auto_reply_subject, auto_reply_body, metadata) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id, domain_id, tenant_id, address, display_name, status, forward_to, auto_reply, auto_reply_subject, auto_reply_body, metadata, created_at, updated_at",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "domain_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "address",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "display_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "status",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "forward_to",
+        "type_info": "TextArray"
+      },
+      {
+        "ordinal": 7,
+        "name": "auto_reply",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 8,
+        "name": "auto_reply_subject",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 9,
+        "name": "auto_reply_body",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 10,
+        "name": "metadata",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 11,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 12,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Text",
+        "Text",
+        "TextArray",
+        "Bool",
+        "Text",
+        "Text",
+        "Jsonb"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      true,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "1e8b397da9ba0fb9cdacd8cccc369483e7c6c353319f0b21cc06fa8d78c279bd"
+}

@@ -1,0 +1,27 @@
+[package]
+name = "sentio-queue"
+description = "NATS / JetStream producer and consumer"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[features]
+test-support = []
+
+[dependencies]
+sentio-core.workspace = true
+async-nats.workspace = true
+futures.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+uuid.workspace = true
+chrono.workspace = true
+rand.workspace = true
+bytes.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+tokio-test.workspace = true

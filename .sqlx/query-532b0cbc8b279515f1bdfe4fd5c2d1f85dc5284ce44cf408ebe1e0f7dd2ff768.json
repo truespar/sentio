@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE ip_pools SET ips = ips || $1 WHERE id = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "InetArray",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "532b0cbc8b279515f1bdfe4fd5c2d1f85dc5284ce44cf408ebe1e0f7dd2ff768"
+}

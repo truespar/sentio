@@ -1,0 +1,76 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id, tenant_id, username, password_hash, mechanisms, scram_stored_key, scram_server_key, scram_salt, scram_iterations, enabled FROM smtp_credentials WHERE username = $1 AND enabled = true",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "username",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "password_hash",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "mechanisms",
+        "type_info": "TextArray"
+      },
+      {
+        "ordinal": 5,
+        "name": "scram_stored_key",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "scram_server_key",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "scram_salt",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 8,
+        "name": "scram_iterations",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 9,
+        "name": "enabled",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      false
+    ]
+  },
+  "hash": "3c0a759acbc1c56dddcd345e44470e074b6657c8e948c8405ea871742f73a548"
+}

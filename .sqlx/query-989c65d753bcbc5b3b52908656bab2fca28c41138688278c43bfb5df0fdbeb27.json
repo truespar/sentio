@@ -1,0 +1,146 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id, tenant_id, domain_name, use_for_sending, use_for_receiving, status, spf_status, spf_error, dkim_status, dkim_error, dmarc_status, dmarc_error, mx_status, mx_error, return_path_status, return_path_error, dns_checked_at, verification_token, verified_at, reject_unknown_recipients, created_at, updated_at FROM domains WHERE status = 'verified' ORDER BY created_at ASC",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "domain_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "use_for_sending",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 4,
+        "name": "use_for_receiving",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 5,
+        "name": "status",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "spf_status",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "spf_error",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 8,
+        "name": "dkim_status",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 9,
+        "name": "dkim_error",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 10,
+        "name": "dmarc_status",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 11,
+        "name": "dmarc_error",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 12,
+        "name": "mx_status",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 13,
+        "name": "mx_error",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 14,
+        "name": "return_path_status",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 15,
+        "name": "return_path_error",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 16,
+        "name": "dns_checked_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 17,
+        "name": "verification_token",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 18,
+        "name": "verified_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 19,
+        "name": "reject_unknown_recipients",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 20,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 21,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      true,
+      false,
+      true,
+      false,
+      true,
+      false,
+      true,
+      true,
+      false,
+      true,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "989c65d753bcbc5b3b52908656bab2fca28c41138688278c43bfb5df0fdbeb27"
+}

@@ -1,0 +1,24 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT 1 AS hit FROM inbound_route_delivery_logs WHERE inbound_route_id = $1 AND message_id = $2 AND recipient = $3 AND delivered_at IS NOT NULL LIMIT 1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "hit",
+        "type_info": "Int4"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Text"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "71a951a4488bd5b017ae0d2d1b63bb1ea87a6f8cfcdeabc7d6d3fd4e4a36d1b2"
+}

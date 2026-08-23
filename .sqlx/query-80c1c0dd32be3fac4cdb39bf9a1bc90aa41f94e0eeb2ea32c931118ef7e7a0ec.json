@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE ip_warmup_schedules SET status = $1 WHERE id = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "80c1c0dd32be3fac4cdb39bf9a1bc90aa41f94e0eeb2ea32c931118ef7e7a0ec"
+}

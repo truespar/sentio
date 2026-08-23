@@ -1,0 +1,82 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id, domain_id, selector, algorithm, private_key, public_key, key_size, status, activated_at, retired_at, created_at FROM dkim_keys WHERE domain_id = $1 AND status = 'active' LIMIT 1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "domain_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "selector",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "algorithm",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "private_key",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "public_key",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "key_size",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 7,
+        "name": "status",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 8,
+        "name": "activated_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 9,
+        "name": "retired_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 10,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      true,
+      true,
+      false
+    ]
+  },
+  "hash": "c7e11a98b7ec7a91007aae29f2ce9d01b20f19765edececd1c4fd74777b248d9"
+}

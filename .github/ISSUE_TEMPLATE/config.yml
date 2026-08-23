@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/truespar/sentio/security/advisories/new
+    about: Report privately. Please do not open a public issue.

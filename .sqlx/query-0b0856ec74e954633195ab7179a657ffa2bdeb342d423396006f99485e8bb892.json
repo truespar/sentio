@@ -1,0 +1,24 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE domains SET spf_status = $1, spf_error = $2, dkim_status = $3, dkim_error = $4, dmarc_status = $5, dmarc_error = $6, mx_status = $7, mx_error = $8, return_path_status = $9, return_path_error = $10, dns_checked_at = now() WHERE id = $11",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "0b0856ec74e954633195ab7179a657ffa2bdeb342d423396006f99485e8bb892"
+}

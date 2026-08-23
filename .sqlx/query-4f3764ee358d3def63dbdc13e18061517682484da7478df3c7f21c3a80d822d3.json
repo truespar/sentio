@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE fbl_reports SET processed_at = now() WHERE id = $1 AND processed_at IS NULL",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "4f3764ee358d3def63dbdc13e18061517682484da7478df3c7f21c3a80d822d3"
+}

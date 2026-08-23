@@ -1,0 +1,61 @@
+[package]
+name = "sentio-api"
+description = "Axum REST API with OpenAPI documentation"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+sentio-core.workspace = true
+sentio-store.workspace = true
+sentio-auth.workspace = true
+sentio-queue.workspace = true
+sentio-storage.workspace = true
+sentio-spam.workspace = true
+sentio-webhooks.workspace = true
+sentio-abuse.workspace = true
+sentio-smtp-client.workspace = true
+axum.workspace = true
+tower.workspace = true
+tower-http = { workspace = true, features = ["trace", "request-id"] }
+tokio.workspace = true
+tracing.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+uuid.workspace = true
+chrono.workspace = true
+base64.workspace = true
+sha2.workspace = true
+hex.workspace = true
+argon2.workspace = true
+hmac.workspace = true
+pbkdf2.workspace = true
+ed25519-dalek.workspace = true
+rsa.workspace = true
+thiserror.workspace = true
+governor.workspace = true
+bytes.workspace = true
+sqlx.workspace = true
+reqwest.workspace = true
+rand.workspace = true
+mail-builder.workspace = true
+mail-parser.workspace = true
+metrics.workspace = true
+ipnetwork.workspace = true
+hickory-resolver.workspace = true
+utoipa.workspace = true
+utoipa-scalar.workspace = true
+
+[dev-dependencies]
+sentio-smtp-server = { workspace = true, features = ["test-support"] }
+sentio-smtp-client = { workspace = true, features = ["test-support"] }
+sentio-queue = { workspace = true, features = ["test-support"] }
+sentio-storage = { workspace = true, features = ["test-support"] }
+sentio-auth.workspace = true
+sentio-store.workspace = true
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
+reqwest = { workspace = true, features = ["json"] }
+serde_json.workspace = true
+uuid.workspace = true
+tracing-subscriber.workspace = true

@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE tracking_domains SET dns_status = $1, dns_error = $2, dns_checked_at = now() WHERE id = $3",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "9cfffe0271653598cc718aecafe905bb57735247fadab6d10f5b1f1d492030c7"
+}

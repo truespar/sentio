@@ -1,0 +1,27 @@
+[package]
+name = "sentio-store"
+description = "PostgreSQL and Redis KV repository implementations"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+sentio-core.workspace = true
+sqlx = { workspace = true, features = ["migrate"] }
+redis.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+uuid.workspace = true
+chrono.workspace = true
+sha2.workspace = true
+base64.workspace = true
+ipnetwork.workspace = true
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["rt-multi-thread", "macros"] }
+sentio-llm = { path = "../sentio-llm" }
+sentio-storage = { path = "../sentio-storage" }
+mail-parser = "0.11"

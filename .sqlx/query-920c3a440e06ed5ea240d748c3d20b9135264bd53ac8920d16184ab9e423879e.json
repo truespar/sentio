@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE ip_pools SET ips = ( SELECT COALESCE(array_agg(ip), '{}') FROM unnest(ips) AS ip WHERE ip != ALL($1) ) WHERE id = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "InetArray",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "920c3a440e06ed5ea240d748c3d20b9135264bd53ac8920d16184ab9e423879e"
+}

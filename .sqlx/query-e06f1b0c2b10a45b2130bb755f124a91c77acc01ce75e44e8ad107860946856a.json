@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE webhooks SET failure_count = 0, last_success_at = now() WHERE id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "e06f1b0c2b10a45b2130bb755f124a91c77acc01ce75e44e8ad107860946856a"
+}

@@ -1,0 +1,130 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id, message_id, tenant_id, event_type, ip_address, user_agent, url, referer, client_name, client_version, device_type, os_name, os_version, is_bot, proxy_open, country_code, region, city, created_at FROM engagement_events WHERE message_id = $1 ORDER BY created_at ASC",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "message_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "event_type",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "ip_address",
+        "type_info": "Inet"
+      },
+      {
+        "ordinal": 5,
+        "name": "user_agent",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "url",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "referer",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 8,
+        "name": "client_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 9,
+        "name": "client_version",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 10,
+        "name": "device_type",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 11,
+        "name": "os_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 12,
+        "name": "os_version",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 13,
+        "name": "is_bot",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 14,
+        "name": "proxy_open",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 15,
+        "name": "country_code",
+        "type_info": "Bpchar"
+      },
+      {
+        "ordinal": 16,
+        "name": "region",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 17,
+        "name": "city",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 18,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      true,
+      true,
+      true,
+      false
+    ]
+  },
+  "hash": "28b6db3ad269a9b3f0d59d0917d19d66249f8312237e93a289badf073d60735b"
+}

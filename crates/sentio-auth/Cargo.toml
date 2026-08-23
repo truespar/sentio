@@ -1,0 +1,27 @@
+[package]
+name = "sentio-auth"
+description = "DKIM, SPF, DMARC, ARC, MTA-STS, DANE, and BIMI authentication"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[features]
+test-support = []
+
+[dependencies]
+sentio-core.workspace = true
+mail-auth.workspace = true
+hickory-resolver.workspace = true
+tracing.workspace = true
+base64.workspace = true
+sha2.workspace = true
+serde.workspace = true
+rustls-pki-types.workspace = true
+reqwest.workspace = true
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
+uuid.workspace = true
+chrono.workspace = true
+serde_json.workspace = true

@@ -1,0 +1,62 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id, tracking_domain_id, certificate, intermediaries, private_key, expires_at, renew_after, created_at FROM tracking_certificates WHERE renew_after <= now() ORDER BY renew_after ASC",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "tracking_domain_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "certificate",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "intermediaries",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "private_key",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "expires_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 6,
+        "name": "renew_after",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 7,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "8ee350bee43d344441ad576c18e4e3a8f01dfa055b71b5d530d533772ff56050"
+}

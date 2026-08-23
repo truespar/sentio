@@ -1,0 +1,53 @@
+[package]
+name = "sentio-smtp-server"
+description = "Inbound SMTP server with TLS and SASL AUTH"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+sentio-core.workspace = true
+sentio-auth.workspace = true
+sentio-store.workspace = true
+sentio-queue.workspace = true
+sentio-smtp-client.workspace = true
+sentio-abuse.workspace = true
+sentio-storage.workspace = true
+sentio-spam.workspace = true
+sentio-llm.workspace = true
+tokio.workspace = true
+tokio-rustls.workspace = true
+rustls.workspace = true
+rustls-pemfile.workspace = true
+rustls-pki-types.workspace = true
+base64.workspace = true
+hmac.workspace = true
+sha2.workspace = true
+hex.workspace = true
+rand.workspace = true
+argon2.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+uuid.workspace = true
+bytes.workspace = true
+memchr.workspace = true
+mail-parser.workspace = true
+mail-builder.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+chrono.workspace = true
+regex.workspace = true
+reqwest.workspace = true
+
+[features]
+default = []
+test-support = []
+
+[dev-dependencies]
+sentio-storage = { workspace = true, features = ["test-support"] }
+sentio-queue = { workspace = true, features = ["test-support"] }
+sentio-llm = { workspace = true, features = ["test-support"] }
+sentio-webhooks.workspace = true
+rcgen.workspace = true
+sqlx.workspace = true

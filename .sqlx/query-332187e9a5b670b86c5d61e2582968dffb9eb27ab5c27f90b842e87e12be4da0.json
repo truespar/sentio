@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE tenants SET name = COALESCE($1, name), tier = COALESCE($2, tier), verp_enabled = COALESCE($3, verp_enabled) WHERE id = $4",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text",
+        "Bool",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "332187e9a5b670b86c5d61e2582968dffb9eb27ab5c27f90b842e87e12be4da0"
+}

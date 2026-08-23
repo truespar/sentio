@@ -1,0 +1,88 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id, tenant_id, blob_key, filename, content_type, size, checksum_sha256, scan_status, scan_result, claimed, expires_at, created_at FROM pending_uploads WHERE id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "blob_key",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "filename",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "content_type",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "size",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 6,
+        "name": "checksum_sha256",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "scan_status",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 8,
+        "name": "scan_result",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 9,
+        "name": "claimed",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 10,
+        "name": "expires_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 11,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      true,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "13ec4842dc7654641ca66cff48dad9c6563fdf3dbdbb76b75d682d31dd56a609"
+}

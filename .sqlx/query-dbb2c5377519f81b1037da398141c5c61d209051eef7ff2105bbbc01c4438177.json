@@ -1,0 +1,30 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO error_events (tenant_id, severity, component, error_type, message, stack_trace, message_id, request_id, metadata) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Uuid",
+        "Text",
+        "Jsonb"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "dbb2c5377519f81b1037da398141c5c61d209051eef7ff2105bbbc01c4438177"
+}

@@ -1,0 +1,124 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id, tenant_id, domain_id, direction, report_id, org_name, date_begin, date_end, source_ip, report_xml, total_count, dkim_pass, dkim_fail, spf_pass, spf_fail, dmarc_pass, dmarc_fail, created_at FROM dmarc_reports WHERE id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "domain_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "direction",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "report_id",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "org_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "date_begin",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 7,
+        "name": "date_end",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 8,
+        "name": "source_ip",
+        "type_info": "Inet"
+      },
+      {
+        "ordinal": 9,
+        "name": "report_xml",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 10,
+        "name": "total_count",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 11,
+        "name": "dkim_pass",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 12,
+        "name": "dkim_fail",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 13,
+        "name": "spf_pass",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 14,
+        "name": "spf_fail",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 15,
+        "name": "dmarc_pass",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 16,
+        "name": "dmarc_fail",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 17,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "ddcb38aa26547b2583e2e10bf383e3446528cf87d7c3e34806b9b18a1f19f627"
+}

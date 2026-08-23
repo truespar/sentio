@@ -1,0 +1,102 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id, tenant_id, domain_id, direction, report_id, org_name, date_begin, date_end, policy_type, policy_domain, total_success, total_failure, failure_details, created_at FROM tlsrpt_reports WHERE domain_id = $1 ORDER BY date_begin DESC LIMIT $2 OFFSET $3",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "domain_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "direction",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "report_id",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "org_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "date_begin",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 7,
+        "name": "date_end",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 8,
+        "name": "policy_type",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 9,
+        "name": "policy_domain",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 10,
+        "name": "total_success",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 11,
+        "name": "total_failure",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 12,
+        "name": "failure_details",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 13,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "0dcd5c2ce9082a61632cf5ddc17f1e812d542d6f8dd9ecbaa788866eda5dd76f"
+}

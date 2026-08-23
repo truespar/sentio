@@ -1,0 +1,26 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO message_events (id, message_id, tenant_id, event_type, smtp_response, remote_mta, diagnostic_code, bounce_class, retry_count, next_retry_at, source_ip, destination_ip, tls_version) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Uuid",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Int4",
+        "Timestamptz",
+        "Inet",
+        "Inet",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "1a41d963c4ea4aca17166e99d8b9aa7803d405df4e53d187f4e2370308711ebf"
+}

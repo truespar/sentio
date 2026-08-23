@@ -1,0 +1,100 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id, message_id, tenant_id, event_type, smtp_response, remote_mta, diagnostic_code, bounce_class, retry_count, next_retry_at, source_ip, destination_ip, tls_version, created_at FROM message_events WHERE message_id = $1 ORDER BY created_at ASC",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "message_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "event_type",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "smtp_response",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "remote_mta",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "diagnostic_code",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "bounce_class",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 8,
+        "name": "retry_count",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 9,
+        "name": "next_retry_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 10,
+        "name": "source_ip",
+        "type_info": "Inet"
+      },
+      {
+        "ordinal": 11,
+        "name": "destination_ip",
+        "type_info": "Inet"
+      },
+      {
+        "ordinal": 12,
+        "name": "tls_version",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 13,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false
+    ]
+  },
+  "hash": "1716b4b261e066bfc69aaf4bfea3fe3d8b5cb266caa7a5e99be3fcce49474af8"
+}

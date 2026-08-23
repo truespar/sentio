@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE smtp_credentials SET enabled = $1 WHERE id = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Bool",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "f2c6196f6c1d9e6e36bf378f2fbcc45b25c8389acfa98438bf5b0c6ee6793e64"
+}

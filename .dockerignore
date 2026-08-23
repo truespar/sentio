@@ -1,0 +1,35 @@
+# Rust build artifacts
+target/
+**/target/
+
+# Local dev state
+.env
+.env.*
+!.env.example
+
+# Editor / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# VCS
+.git/
+.gitignore
+
+# Compose local volumes (should never be baked in)
+docker-data/
+volumes/
+
+# Production configs - the image ships config/oss.toml only
+config/production.toml
+config/local.toml
+/etc/sentio/
+
+# Docs / scratch not needed in the image
+*.log
+tmp/
+scratchpad/
+
+# Keep the sqlx offline cache - the builder needs it
+!.sqlx/

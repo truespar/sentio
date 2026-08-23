@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO tenant_ip_assignments (tenant_id, ip_pool_id, priority) VALUES ($1, $2, $3) ON CONFLICT (tenant_id, ip_pool_id) DO UPDATE SET priority = EXCLUDED.priority",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "c2cec7a98022c07c68913eae6ae8169c7e0a3f8a10a8385f4274366b78661d43"
+}

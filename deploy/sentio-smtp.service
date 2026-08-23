@@ -1,0 +1,57 @@
+[Unit]
+Description=Sentio SMTP - Multi-tenant Email Platform
+Documentation=https://github.com/truespar/sentio
+
+# Hard dependencies - Sentio cannot start without these. systemd will
+# refuse to start sentio-smtp if any of these fail to come up, and will
+# pull them down if sentio-smtp is stopped.
+Requires=postgresql.service nats.service redis-server.service
+
+# Soft dependencies - Sentio runs without them but loses features:
+#   redis-server  → rspamd backing store (history, ratelimit, replies)
+#   rspamd        → spam scoring (sentio falls back to its builtin scorer)
+#   clamav-daemon → virus scanning of attachments / inbound
+Wants=redis-server.service rspamd.service clamav-daemon.service
+
+# Start order: only after the deps above are ready and the network is up.
+After=network-online.target postgresql.service nats.service redis-server.service rspamd.service clamav-daemon.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+
+# Account that owns the build directory and the production config. The
+# config file (/etc/sentio/production.toml) must be readable by this
+# group (recommend root:sysop 640).
+User=sysop
+Group=sysop
+WorkingDirectory=/home/sysop/sentio
+
+# Production config holds DB / Redis / S3 / NATS credentials.
+ExecStart=/usr/local/bin/sentio-smtp --config /etc/sentio/production.toml
+# No ExecReload: Sentio has no SIGHUP handler, so a reload signal would
+# terminate the process (libc default). certbot's post-renewal hook uses
+# `systemctl reload-or-restart`, which without ExecReload falls through
+# to a full restart - the only way TLS cert changes take effect anyway.
+Restart=always
+RestartSec=5
+
+# Sandboxing
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/var/log /tmp
+PrivateTmp=true
+
+# Bind privileged ports 25 / 465 / 587 as a non-root user.
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+
+LimitNOFILE=65535
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=sentio-smtp
+
+[Install]
+WantedBy=multi-user.target

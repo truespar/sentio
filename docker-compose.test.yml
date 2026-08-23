@@ -1,0 +1,63 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Sentio SMTP - end-to-end test overlay
+#
+#   docker compose -f docker-compose.yml -f docker-compose.test.yml up -d
+#   scripts/e2e/run-e2e.sh
+#
+# Adds two sinks and points outbound delivery at one of them:
+#
+#   mailpit       - catch-all SMTP sink on :1025 with a REST API + web UI on
+#                   :8025 (published). Everything Sentio delivers lands here.
+#   webhook-sink  - echoes any HTTP request back and logs the body, so inbound
+#                   route deliveries can be asserted from `docker compose logs`.
+#
+# SAFETY - why no mail can escape to the internet:
+#
+#   1. delivery.relay.enabled=true makes DeliveryEngine skip MX resolution
+#      entirely and hand every outbound message to relay.host
+#      (crates/sentio-smtp-client/src/delivery.rs). There is no code path left
+#      that dials a public MX.
+#   2. The fixtures use *.test domains. RFC 6761 reserves .test as never
+#      globally resolvable, so even if the relay were misconfigured the lookup
+#      fails rather than reaching a real server.
+#
+# Both belts are deliberate: either one alone would be sufficient.
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+
+  mailpit:
+    image: axllent/mailpit:latest
+    restart: unless-stopped
+    environment:
+      MP_SMTP_BIND_ADDR: "0.0.0.0:1025"
+      MP_UI_BIND_ADDR: "0.0.0.0:8025"
+      MP_MAX_MESSAGES: "500"
+      # Accept anything; this is a sink, not a real MTA.
+      MP_SMTP_AUTH_ACCEPT_ANY: "true"
+      MP_SMTP_AUTH_ALLOW_INSECURE: "true"
+    ports:
+      - "8025:8025"          # web UI + REST API, browsable from the host
+    healthcheck:
+      test: ["CMD", "/mailpit", "readyz"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks: [sentio_net]
+
+  webhook-sink:
+    image: mendhak/http-https-echo:37
+    restart: unless-stopped
+    environment:
+      HTTP_PORT: "8080"
+    networks: [sentio_net]
+
+  # Point outbound delivery at mailpit instead of real MX hosts.
+  sentio:
+    environment:
+      SENTIO__DELIVERY__RELAY__ENABLED: "true"
+      SENTIO__DELIVERY__RELAY__HOST: "mailpit"
+      SENTIO__DELIVERY__RELAY__PORT: "1025"
+      SENTIO__DELIVERY__RELAY__TLS_MODE: "none"
+    depends_on:
+      mailpit: { condition: service_healthy }

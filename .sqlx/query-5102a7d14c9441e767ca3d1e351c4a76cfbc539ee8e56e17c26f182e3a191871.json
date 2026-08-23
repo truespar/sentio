@@ -1,0 +1,19 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE messages SET status           = 'bounced', bounced_at       = now(), bounce_class     = $2, smtp_code        = $3, enhanced_status  = $4, diagnostic       = $5, failed_recipient = $6 WHERE id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Int4",
+        "Text",
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "5102a7d14c9441e767ca3d1e351c4a76cfbc539ee8e56e17c26f182e3a191871"
+}

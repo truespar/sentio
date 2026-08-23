@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM tenant_ip_assignments WHERE tenant_id = $1 AND ip_pool_id = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "5e374eb3e9dd3206c32d88a98a258c945ca9b5a84ab190db1875a5c2fe8588a6"
+}

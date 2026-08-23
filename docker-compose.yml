@@ -1,0 +1,211 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Sentio SMTP - OSS quickstart docker-compose stack
+#
+#   docker compose up -d --build      # build sentio image + start everything
+#   docker compose logs -f sentio     # tail app logs
+#   docker compose down -v            # stop and wipe volumes
+#
+# What runs:
+#   sentio         - the SMTP + REST API server (ports 25, 465, 587, 8080)
+#   sentio-migrate - one-shot: applies DB migrations + seeds bootstrap tenant
+#   postgres       - application state (tenants, messages, credentials, …)
+#   redis          - KV backend (rate limits, greylist, bans, rspamd Bayes)
+#   nats           - JetStream (queue + delivery pipeline)
+#   minio          - S3-compatible blob storage for raw .eml / attachments
+#   minio-init     - one-shot: creates the sentio-attachments bucket
+#   clamav         - antivirus (attachment scanning, port 3310)
+#   rspamd         - spam scorer (port 11333)
+#
+# Bootstrap credentials (migration 007 auto-seeds these):
+#   Tenant ID : 00000000-0000-0000-0000-000000000001 ("Sentio Platform")
+#   API key   : sentio_bootstrap_admin_CHANGE_ME
+#
+#   ⚠ Rotate the API key immediately if this host is reachable from the
+#     internet. See README-docker.md.
+#
+# DNS / DNSBL note:
+#   Sentio and rspamd use Docker's embedded DNS by default. Spamhaus
+#   (zen.spamhaus.org, dbl.spamhaus.org) refuses queries from shared public
+#   resolvers and will return 127.255.255.254 under real volume. For
+#   production, either (a) register a free Spamhaus Data Query Service key
+#   and rewrite the DNSBL lists to use <key>.zen.dq.spamhaus.net, or
+#   (b) add an unbound recursive resolver service and point everything at it.
+# ─────────────────────────────────────────────────────────────────────────────
+
+name: sentio-oss
+
+x-sentio-env: &sentio-env
+  RUST_LOG: info
+  SENTIO__DATABASE__URL: "postgres://sentio:sentio@postgres:5432/sentio"
+  SENTIO__KV__BACKEND: "redis"
+  SENTIO__REDIS__URL: "redis://redis:6379/0"
+  SENTIO__NATS__URL: "nats://nats:4222"
+  SENTIO__STORAGE__ENDPOINT_URL: "http://minio:9000"
+  SENTIO__STORAGE__ACCESS_KEY: "sentio-dev"
+  SENTIO__STORAGE__SECRET_KEY: "sentio-dev-secret-CHANGE_ME"
+  SENTIO__STORAGE__BUCKET: "sentio-attachments"
+  SENTIO__SCANNING__CLAMD_HOST: "clamav:3310"
+  SENTIO__SPAM__RSPAMD__URL: "http://rspamd:11333"
+
+services:
+
+  # ── Data plane ──────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: sentio
+      POSTGRES_PASSWORD: sentio
+      POSTGRES_DB: sentio
+    volumes:
+      # PG18+ images store data in a major-version subdirectory and reject a
+      # mount at /var/lib/postgresql/data. Mount the parent instead.
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sentio -d sentio"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks: [sentio_net]
+
+  redis:
+    image: redis:8-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--save", "60", "1000", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks: [sentio_net]
+
+  nats:
+    image: nats:2.11-alpine
+    restart: unless-stopped
+    command: ["-c", "/etc/nats/nats-server.conf"]
+    volumes:
+      - ./docker/nats/nats-server.conf:/etc/nats/nats-server.conf:ro
+      - nats_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://localhost:8222/healthz | grep -q ok"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks: [sentio_net]
+
+  minio:
+    image: quay.io/minio/minio:latest
+    restart: unless-stopped
+    command: ["server", "/data", "--console-address", ":9001"]
+    environment:
+      MINIO_ROOT_USER: "sentio-dev"
+      MINIO_ROOT_PASSWORD: "sentio-dev-secret-CHANGE_ME"
+    volumes:
+      - minio_data:/data
+    ports:
+      - "9001:9001"          # web console (optional; comment out to hide)
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:9000/minio/health/ready"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks: [sentio_net]
+
+  minio-init:
+    image: quay.io/minio/mc:latest
+    restart: "no"
+    depends_on:
+      minio: { condition: service_healthy }
+    environment:
+      MINIO_URL: "http://minio:9000"
+      MINIO_ROOT_USER: "sentio-dev"
+      MINIO_ROOT_PASSWORD: "sentio-dev-secret-CHANGE_ME"
+      SENTIO_BUCKET: "sentio-attachments"
+    volumes:
+      - ./docker/minio/init.sh:/init.sh:ro
+    entrypoint: ["/bin/sh", "/init.sh"]
+    networks: [sentio_net]
+
+  # ── Content scanners ────────────────────────────────────────────────────
+  clamav:
+    image: clamav/clamav:1.5.4
+    restart: unless-stopped
+    volumes:
+      - clamav_data:/var/lib/clamav
+    healthcheck:
+      test: ["CMD", "clamdcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 20
+      start_period: 300s        # freshclam DB download can take a while
+    networks: [sentio_net]
+
+  rspamd:
+    image: rspamd/rspamd:latest
+    restart: unless-stopped
+    depends_on:
+      redis: { condition: service_healthy }
+    volumes:
+      - ./docker/rspamd/local.d:/etc/rspamd/local.d:ro
+      - rspamd_data:/var/lib/rspamd
+    healthcheck:
+      test: ["CMD", "rspamadm", "control", "stat"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [sentio_net]
+
+  # ── One-shot: run migrations + seed bootstrap tenant + API key ──────────
+  sentio-migrate:
+    build: .
+    image: sentio-smtp:latest
+    restart: "no"
+    depends_on:
+      postgres: { condition: service_healthy }
+    environment:
+      <<: *sentio-env
+    command: ["--config", "/etc/sentio/oss.toml", "migrate"]
+    networks: [sentio_net]
+
+  # ── The application ─────────────────────────────────────────────────────
+  sentio:
+    build: .
+    image: sentio-smtp:latest
+    restart: unless-stopped
+    depends_on:
+      sentio-migrate: { condition: service_completed_successfully }
+      postgres:       { condition: service_healthy }
+      redis:          { condition: service_healthy }
+      nats:           { condition: service_healthy }
+      minio-init:     { condition: service_completed_successfully }
+      clamav:         { condition: service_healthy }
+      rspamd:         { condition: service_healthy }
+    environment:
+      <<: *sentio-env
+    ports:
+      - "25:25"            # SMTP MX  (edit / remove for laptops behind NAT)
+      - "465:465"          # SMTPS
+      - "587:587"          # Submission (STARTTLS)
+      - "8080:8080"        # REST API
+      # - "9090:9090"      # Prometheus metrics - unauth; keep internal
+    volumes:
+      - sentio_data:/var/lib/sentio
+      # Mount your own cert bundle at /etc/sentio/tls/ to enable STARTTLS +
+      # implicit TLS. Without these files Sentio runs plain SMTP only.
+      # - ./tls:/etc/sentio/tls:ro
+    networks: [sentio_net]
+
+volumes:
+  postgres_data:
+  redis_data:
+  nats_data:
+  minio_data:
+  clamav_data:
+  rspamd_data:
+  sentio_data:
+
+networks:
+  sentio_net:
+    driver: bridge

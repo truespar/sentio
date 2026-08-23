@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 60" width="220" height="60" role="img" aria-label="Sentio">
+  <title>Sentio</title>
+  <!-- Generated from the wordmark the server prints at startup:
+     ▄▀▀ █▀▀ █▄ █ ▀█▀ █ ▄▀▄
+     ▀▀▄ █▀▀ █ ▀█  █  █ █ █
+     ▀▀▀ ▀▀▀ ▀  ▀  ▀  ▀ ▀▀▀
+       Drawn as rects rather than shipped as text because GitHub applies a
+       line-height to <pre> and strips style attributes, so half-block
+       characters cannot tile there and the rows separate. -->
+  <g fill="#1f2328" shape-rendering="crispEdges">
+    <rect x="10" y="0" width="20" height="10"/>
+    <rect x="40" y="0" width="30" height="10"/>
+    <rect x="80" y="0" width="10" height="10"/>
+    <rect x="110" y="0" width="10" height="10"/>
+    <rect x="130" y="0" width="30" height="10"/>
+    <rect x="170" y="0" width="10" height="10"/>
+    <rect x="200" y="0" width="10" height="10"/>
+    <rect x="0" y="10" width="10" height="10"/>
+    <rect x="40" y="10" width="10" height="10"/>
+    <rect x="80" y="10" width="20" height="10"/>
+    <rect x="110" y="10" width="10" height="10"/>
+    <rect x="140" y="10" width="10" height="10"/>
+    <rect x="170" y="10" width="10" height="10"/>
+    <rect x="190" y="10" width="10" height="10"/>
+    <rect x="210" y="10" width="10" height="10"/>
+    <rect x="0" y="20" width="20" height="10"/>
+    <rect x="40" y="20" width="30" height="10"/>
+    <rect x="80" y="20" width="10" height="10"/>
+    <rect x="100" y="20" width="20" height="10"/>
+    <rect x="140" y="20" width="10" height="10"/>
+    <rect x="170" y="20" width="10" height="10"/>
+    <rect x="190" y="20" width="10" height="10"/>
+    <rect x="210" y="20" width="10" height="10"/>
+    <rect x="20" y="30" width="10" height="10"/>
+    <rect x="40" y="30" width="10" height="10"/>
+    <rect x="80" y="30" width="10" height="10"/>
+    <rect x="110" y="30" width="10" height="10"/>
+    <rect x="140" y="30" width="10" height="10"/>
+    <rect x="170" y="30" width="10" height="10"/>
+    <rect x="190" y="30" width="10" height="10"/>
+    <rect x="210" y="30" width="10" height="10"/>
+    <rect x="0" y="40" width="30" height="10"/>
+    <rect x="40" y="40" width="30" height="10"/>
+    <rect x="80" y="40" width="10" height="10"/>
+    <rect x="110" y="40" width="10" height="10"/>
+    <rect x="140" y="40" width="10" height="10"/>
+    <rect x="170" y="40" width="10" height="10"/>
+    <rect x="190" y="40" width="30" height="10"/>
+  </g>
+</svg>

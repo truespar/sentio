@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE messages SET llm_category = $1, llm_summary = $2, llm_classified_at = now() WHERE id = $3",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "9440a508071a0bb28c271f1214dcbfc034a20dab3edbe0bf51f026984ccb5d40"
+}

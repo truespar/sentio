@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE dkim_keys SET status = 'retired', retired_at = now() WHERE id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "33707c25a4a1b8999f3b085e3bcb8031e1424570d328de6ff9ef6d997c2add50"
+}

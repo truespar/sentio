@@ -1,0 +1,94 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id, message_id, tenant_id, filename, content_type, size, content_id, disposition, blob_key, checksum_sha256, scan_status, scan_result, created_at FROM message_attachments WHERE message_id = $1 ORDER BY created_at ASC",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "message_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "filename",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "content_type",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "size",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 6,
+        "name": "content_id",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "disposition",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 8,
+        "name": "blob_key",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 9,
+        "name": "checksum_sha256",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 10,
+        "name": "scan_status",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 11,
+        "name": "scan_result",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 12,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      true,
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "74e55e67db5f85c0069cd82f535303740ec335175cbd08a9abd5a5d904ef2569"
+}

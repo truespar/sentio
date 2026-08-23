@@ -1,0 +1,94 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id, tenant_id, original_message_id, original_message_id_hdr, complained_recipient, complaint_type, feedback_type, source_ip, arrival_date, report_raw, auto_suppressed, processed_at, created_at FROM fbl_reports WHERE id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "original_message_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "original_message_id_hdr",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "complained_recipient",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "complaint_type",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "feedback_type",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "source_ip",
+        "type_info": "Inet"
+      },
+      {
+        "ordinal": 8,
+        "name": "arrival_date",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 9,
+        "name": "report_raw",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 10,
+        "name": "auto_suppressed",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 11,
+        "name": "processed_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 12,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "d6296dcbd97eb971fe230259fd071a210ba77056cb8159c8b3288bd98db28190"
+}

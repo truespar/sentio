@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE message_attachments SET scan_status = $1, scan_result = $2 WHERE id = $3",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "bfa44b7c9d35aa695237cc37aae7482de12d785c2832ec52904eb3ef3f29ceaa"
+}

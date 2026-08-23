@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE domains SET status = 'verified', verified_at = now() WHERE id = $1 AND verification_token = $2 AND status = 'pending'",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "ea2974003507572e07d797cbf3759e4f2e7735d5e0629617d6dca3e82ff4e23a"
+}

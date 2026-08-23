@@ -1,0 +1,181 @@
+[workspace]
+members = [
+    "crates/sentio-core",
+    "crates/sentio-smtp-server",
+    "crates/sentio-smtp-client",
+    "crates/sentio-auth",
+    "crates/sentio-queue",
+    "crates/sentio-api",
+    "crates/sentio-webhooks",
+    "crates/sentio-llm",
+    "crates/sentio-spam",
+    "crates/sentio-abuse",
+    "crates/sentio-storage",
+    "crates/sentio-store",
+    "crates/sentio-observe",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+authors = ["Truespar Team"]
+license = "Apache-2.0"
+
+[package]
+name = "sentio-smtp"
+description = "Multi-tenant SMTP platform"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "sentio-smtp"
+path = "src/main.rs"
+
+[dependencies]
+sentio-core = { path = "crates/sentio-core" }
+sentio-smtp-server = { path = "crates/sentio-smtp-server" }
+sentio-smtp-client = { path = "crates/sentio-smtp-client" }
+sentio-auth = { path = "crates/sentio-auth" }
+sentio-queue = { path = "crates/sentio-queue" }
+sentio-api = { path = "crates/sentio-api" }
+sentio-webhooks = { path = "crates/sentio-webhooks" }
+sentio-llm = { path = "crates/sentio-llm" }
+sentio-spam = { path = "crates/sentio-spam" }
+sentio-abuse = { path = "crates/sentio-abuse" }
+sentio-storage = { path = "crates/sentio-storage" }
+sentio-store = { path = "crates/sentio-store" }
+sentio-observe = { path = "crates/sentio-observe" }
+tokio.workspace = true
+clap.workspace = true
+chrono.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+hickory-resolver.workspace = true
+rustls.workspace = true
+
+[workspace.dependencies]
+# Async runtime
+tokio = { version = "1", features = ["full"] }
+
+# TLS
+rustls = { version = "0.23", features = ["aws-lc-rs"] }
+tokio-rustls = "0.26"
+webpki-roots = "1"
+
+# Email parsing and auth
+mail-parser = "0.11.2"
+mail-auth = { version = "0.12", features = ["arc"] }
+mail-builder = "0.5"
+
+# Networking
+ipnetwork = "0.21"
+
+# DNS
+hickory-resolver = "0.26"
+
+# HTTP API
+axum = { version = "0.8", features = ["multipart"] }
+tower = "0.5"
+tower-http = "0.7"
+reqwest = { version = "0.13", features = ["json"] }
+
+# OpenAPI documentation
+utoipa = { version = "5", features = ["chrono", "uuid"] }
+utoipa-scalar = { version = "0.3", features = ["axum"] }
+
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "1.1"
+
+# Enum serialization
+strum = { version = "0.28", features = ["derive"] }
+
+# Database
+sqlx = { version = "0.9", features = ["postgres", "runtime-tokio", "uuid", "chrono", "json", "ipnetwork"] }
+
+# KV store - rate limits, bans, greylisting, warmup counters. Any
+# RESP-compatible server (Redis, Valkey, …) works. Selected by
+# `[kv] backend` in config.toml.
+redis = { version = "1", features = ["tokio-comp", "connection-manager"] }
+
+# Message queue (NATS / JetStream)
+async-nats = "0.50"
+futures = "0.3"
+
+# Blob storage (S3-compatible: AWS S3, R2, B2, MinIO, SeaweedFS, Ceph, …)
+aws-config = { version = "1", features = ["behavior-version-latest"] }
+aws-sdk-s3 = "1"
+aws-credential-types = "1"
+aws-smithy-types = "1"
+
+# Virus scanning
+clamav-client = { version = "2.2", features = ["tokio-stream"] }
+
+# Crypto
+hex = "0.4"
+hmac = "0.13"
+sha2 = "0.11"
+pbkdf2 = "0.13"
+base64 = "0.23"
+subtle = "2.5"
+uuid = { version = "1", features = ["v4", "v7", "serde"] }
+rustls-pki-types = "1"
+rustls-pemfile = "2"
+argon2 = "0.5"
+ed25519-dalek = { version = "3", features = ["rand_core"] }
+rsa = { version = "0.9", features = ["pkcs5"] }
+
+# Random
+rand = "0.10"
+
+# Rate limiting
+governor = "0.10"
+
+# Observability
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["json", "env-filter"] }
+metrics = "0.24"
+metrics-exporter-prometheus = "0.18"
+
+# Text processing
+regex = "1"
+url = "2"
+
+# Byte handling
+bytes = "1"
+memchr = "2"
+
+# Time
+chrono = { version = "0.4", features = ["serde"] }
+
+# CLI
+clap = { version = "4", features = ["derive"] }
+
+# Error handling
+thiserror = "2"
+anyhow = "1"
+
+# Testing
+rcgen = "0.14"
+wiremock = "0.6"
+testcontainers = "0.28"
+tokio-test = "0.4"
+
+# Internal crates
+sentio-core = { path = "crates/sentio-core" }
+sentio-smtp-server = { path = "crates/sentio-smtp-server" }
+sentio-smtp-client = { path = "crates/sentio-smtp-client" }
+sentio-auth = { path = "crates/sentio-auth" }
+sentio-queue = { path = "crates/sentio-queue" }
+sentio-api = { path = "crates/sentio-api" }
+sentio-webhooks = { path = "crates/sentio-webhooks" }
+sentio-llm = { path = "crates/sentio-llm" }
+sentio-spam = { path = "crates/sentio-spam" }
+sentio-abuse = { path = "crates/sentio-abuse" }
+sentio-storage = { path = "crates/sentio-storage" }
+sentio-store = { path = "crates/sentio-store" }
+sentio-observe = { path = "crates/sentio-observe" }

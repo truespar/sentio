@@ -1,0 +1,24 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO ip_pools (name, pool_type, ips) VALUES ($1, $2, $3) RETURNING id",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text",
+        "InetArray"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "61a4decb21b0413b703ec68161de885a6589cc05646072d0fb2c773c071996ee"
+}

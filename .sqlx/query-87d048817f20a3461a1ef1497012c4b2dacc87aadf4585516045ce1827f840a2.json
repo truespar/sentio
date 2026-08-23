@@ -1,0 +1,90 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id, inbound_route_id, tenant_id, message_id, recipient, http_status, response_body, attempt_number, delivered_at, failed_at, error_message, created_at FROM inbound_route_delivery_logs WHERE tenant_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "inbound_route_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "message_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 4,
+        "name": "recipient",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "http_status",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 6,
+        "name": "response_body",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "attempt_number",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 8,
+        "name": "delivered_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 9,
+        "name": "failed_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 10,
+        "name": "error_message",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 11,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      false,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      false
+    ]
+  },
+  "hash": "87d048817f20a3461a1ef1497012c4b2dacc87aadf4585516045ce1827f840a2"
+}

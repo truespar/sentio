@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM suppressions WHERE tenant_id = $1 AND email = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "d7dc45ca58e461cd5a6dc4a10678c7e01af5a253e2d4bb97adb57cd4a4c421ba"
+}

@@ -1,0 +1,26 @@
+[package]
+name = "sentio-spam"
+description = "rspamd integration and builtin scoring engine"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[features]
+test-support = []
+
+[dependencies]
+sentio-core.workspace = true
+sentio-abuse.workspace = true
+reqwest.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+regex.workspace = true
+url.workspace = true
+
+[dev-dependencies]
+wiremock.workspace = true
+tokio-test.workspace = true
+sentio-abuse = { workspace = true, features = ["test-support"] }

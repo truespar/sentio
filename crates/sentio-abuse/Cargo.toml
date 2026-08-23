@@ -1,0 +1,25 @@
+[package]
+name = "sentio-abuse"
+description = "KV-backed rate limiting, IP bans, and greylisting"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[features]
+test-support = []
+integration = []
+
+[dependencies]
+sentio-core.workspace = true
+sentio-store.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+chrono.workspace = true
+sha2.workspace = true
+hickory-resolver.workspace = true
+metrics.workspace = true
+ipnet = "2"
+
+[dev-dependencies]
+tokio-test.workspace = true

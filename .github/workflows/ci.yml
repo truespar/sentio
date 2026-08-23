@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+  # Builds read the committed .sqlx/ cache, so no database is needed.
+  SQLX_OFFLINE: "true"
+
+jobs:
+  check:
+    name: fmt, clippy, test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - uses: Swatinem/rust-cache@v2
+
+      # aws-lc-rs (the rustls backend) needs cmake; some deps need libclang.
+      - name: Install build dependencies
+        run: sudo apt-get update && sudo apt-get install -y cmake libclang-dev
+
+      - name: Formatting
+        run: cargo fmt --all -- --check
+
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets -- -D warnings
+
+      - name: Tests
+        run: cargo test --workspace
+
+      - name: Release build
+        run: cargo build --release --bin sentio-smtp
+
+      # The committed spec must match the code, or generated clients drift.
+      - name: OpenAPI spec is up to date
+        run: |
+          ./target/release/sentio-smtp openapi > /tmp/openapi.json
+          diff -u docs/openapi.json /tmp/openapi.json \
+            || { echo "::error::docs/openapi.json is stale - run: cargo run -- openapi > docs/openapi.json"; exit 1; }
+
+  docker:
+    name: docker build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

@@ -1,0 +1,29 @@
+# Rust build artifacts
+/target/
+**/*.rs.bk
+
+# Cargo lock for binary (keep it tracked)
+# Cargo.lock
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Production config (contains credentials)
+config/production.toml
+
+# Logs
+*.log
+nul
+
+# Local compose overrides (per-machine, not for commit)
+docker-compose.override.yml

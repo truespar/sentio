@@ -1,0 +1,41 @@
+name: Bug report
+description: Something behaves differently than documented
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: Include the actual error or log output, not a paraphrase.
+    validations: {required: true}
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected instead
+    validations: {required: true}
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. docker compose up -d
+        2. curl ...
+        3. ...
+    validations: {required: true}
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+    validations: {required: true}
+  - type: dropdown
+    id: install
+    attributes:
+      label: How are you running it
+      options: [Docker Compose, Built from source, Other]
+    validations: {required: true}
+  - type: textarea
+    id: config
+    attributes:
+      label: Relevant configuration
+      description: Redact credentials before pasting.
+      render: toml

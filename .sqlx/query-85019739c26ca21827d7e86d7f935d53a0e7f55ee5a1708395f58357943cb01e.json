@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE pending_uploads SET claimed = true WHERE id = $1 AND claimed = false",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "85019739c26ca21827d7e86d7f935d53a0e7f55ee5a1708395f58357943cb01e"
+}

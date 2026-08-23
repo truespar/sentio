@@ -1,0 +1,28 @@
+[package]
+name = "sentio-webhooks"
+description = "HMAC-signed webhook event dispatch with retries"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[features]
+test-support = []
+
+[dependencies]
+sentio-core.workspace = true
+sentio-queue.workspace = true
+reqwest.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+hmac.workspace = true
+sha2.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+chrono.workspace = true
+uuid.workspace = true
+rand.workspace = true
+axum.workspace = true
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }

@@ -1,0 +1,240 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Sentio SMTP - OSS quickstart config
+#
+# Bundled with the OSS Docker image. Points every backend at the docker-compose
+# service names (postgres / redis / nats / minio / clamav / rspamd / unbound).
+#
+# Every value below is overridable via SENTIO__SECTION__KEY environment
+# variables - the compose file uses that pattern for anything that varies
+# between deployments (hostname, credentials, resource limits).
+# ─────────────────────────────────────────────────────────────────────────────
+
+[server]
+hostname = "localhost"
+dns_resolver = "system"          # points at unbound via /etc/resolv.conf
+# One entry per port. On Linux (net.ipv6.bindv6only=0) a "[::]" bind already
+# accepts IPv4, so listing both 0.0.0.0 and [::] for the same port makes the
+# second bind fail with EADDRINUSE and aborts the remaining listeners.
+listen_smtp = ["0.0.0.0:25"]
+listen_smtps = ["0.0.0.0:465"]
+listen_submission = ["0.0.0.0:587"]
+listen_api = "0.0.0.0:8080"
+workers = 0
+max_connections = 10000
+proxy_protocol = false
+xclient_enabled = false
+xclient_allowed_ips = []
+shutdown_drain_secs = 30
+shutdown_force_secs = 60
+max_api_body_size_mb = 50
+
+[server.inbound_timeouts]
+greeting_secs = 300
+command_secs = 300
+data_initiation_secs = 120
+data_block_secs = 180
+data_termination_secs = 600
+
+[server.inbound_limits]
+max_recipients_per_message = 100
+max_messages_per_session = 50
+max_message_size_mb = 50
+max_received_headers = 50
+max_line_length = 998
+max_auth_attempts = 3
+max_commands_per_session = 1000
+strict_ehlo_validation = false
+
+[tls]
+# No cert bundled - image gracefully falls back to plain SMTP if these files
+# are missing. Mount your own cert/key at /etc/sentio/tls/ or use the ACME
+# block below for automatic Let's Encrypt in production.
+cert_path = "/etc/sentio/tls/cert.pem"
+key_path = "/etc/sentio/tls/key.pem"
+min_version = "1.2"
+sni_enabled = true
+
+[tls.acme]
+enabled = false
+email = "admin@example.com"
+directory_url = "https://acme-v02.api.letsencrypt.org/directory"
+domains = ["localhost"]
+storage_path = "/var/lib/sentio/acme"
+
+[database]
+url = "postgres://sentio:sentio@postgres:5432/sentio"
+max_connections = 50
+min_connections = 5
+
+[kv]
+# Rate limits, bans, greylisting, warmup counters.
+backend = "redis"
+
+[redis]
+url = "redis://redis:6379/0"
+
+[nats]
+url = "nats://nats:4222"
+prefetch_count = 50
+llm_prefetch_count = 1
+publisher_confirms = true
+connection_timeout_secs = 30
+max_retries = 5
+stream_max_age_secs = 86400
+dead_stream_max_age_secs = 2592000
+
+[storage]
+# MinIO in the compose stack. Point at any S3-compatible endpoint in
+# production (AWS S3, R2, B2, Wasabi, etc.) via SENTIO__STORAGE__* env vars.
+endpoint_url = "http://minio:9000"
+access_key = "sentio-dev"
+secret_key = "sentio-dev-secret-CHANGE_ME"
+bucket = "sentio-attachments"
+path_style = true
+region = "us-east-1"
+store_raw_eml = true
+orphan_cleanup_interval_hours = 6
+orphan_max_age_hours = 24
+
+[scanning]
+enabled = true
+clamd_host = "clamav:3310"
+clamd_timeout_secs = 30
+max_attachment_size_mb = 25
+max_message_size_mb = 50
+
+[scanning.per_tenant_defaults]
+scan_inbound = true
+scan_outbound = false
+reject_on_virus = true
+
+[abuse]
+max_connections_per_minute = 50
+max_auth_failures_per_hour = 10
+ban_duration_secs = 3600
+reputation_warn_threshold = 5.0
+reputation_greylist_threshold = 7.5
+reputation_reject_threshold = 10.0
+reputation_decay_hours = 24
+reverse_dns_required = false
+dnsbl_lists = ["zen.spamhaus.org", "b.barracudacentral.org", "bl.spamcop.net", "dnsbl.sorbs.net"]
+dnsbl_cache_secs = 3600
+whitelist_ips = []
+whitelist_cidrs = []
+
+[abuse.greylist]
+enabled = true
+min_delay_secs = 300
+max_age_hours = 48
+
+[spam]
+backend = "rspamd"
+score_reject = 12.0
+score_add_header = 6.0
+score_greylist = 4.0
+score_llm_review_min = 4.0
+score_llm_review_max = 6.0
+
+[spam.rspamd]
+url = "http://rspamd:11333"
+timeout_secs = 10
+password = ""
+
+[spam.builtin]
+dnsbl_lists = ["zen.spamhaus.org", "b.barracudacentral.org", "bl.spamcop.net", "dnsbl.sorbs.net"]
+uribl_lists = ["multi.uribl.com", "dbl.spamhaus.org"]
+bayes_enabled = true
+heuristics_enabled = true
+
+[delivery]
+max_connections = 1000
+max_connections_per_dest = 20
+idle_timeout_secs = 300
+retry_base_secs = 300
+retry_max_secs = 4000
+max_retries = 50
+queue_lifetime_days = 5
+batch_size = 100
+max_schedule_hours = 72
+
+[delivery.rate_limits]
+default_per_minute = 100
+gmail_per_minute = 50
+microsoft_per_minute = 80
+
+[delivery.relay]
+enabled = false                  # OSS: talk to MX directly, no relay hop
+host = "127.0.0.1"
+port = 2525
+tls_mode = "none"
+
+[auth]
+dkim_default_selector = "sentio"
+dkim_algorithm = "rsa"           # RSA-2048 by default (Gmail treats ed25519 as neutral)
+dkim_rsa_key_bits = 2048
+spf_check_inbound = true
+dmarc_check_inbound = true
+arc_sign_forward = true
+mta_sts_cache_secs = 86400
+dane_enabled = true
+bimi_check_inbound = true
+bimi_vmc_required = false
+
+[auth.fbl]
+enabled = true
+fbl_address = "fbl@localhost"
+auto_suppress = true
+
+[deliverability]
+list_unsubscribe_enabled = true
+batv_enabled = true
+batv_key = ""
+batv_tag_lifetime_days = 7
+required_addresses = ["postmaster", "abuse"]
+dns_check_interval_hours = 6
+
+[tracking]
+open_tracking = false
+click_tracking = false
+tracking_domain = ""
+
+[webhooks]
+max_retries = 10
+retry_backoff_base_secs = 60
+signing_algorithm = "hmac-sha256"
+delivery_timeout_secs = 30
+max_concurrent_per_endpoint = 10
+max_per_second_per_endpoint = 100
+
+[llm]
+# No LLM host in the OSS stack. Set enabled = true and point at OpenAI, an
+# Ollama instance, or Anthropic to turn on LLM classification.
+enabled = false
+provider = "openai"
+model = "gpt-4o-mini"
+base_url = ""
+api_key_env = "OPENAI_API_KEY"
+temperature = 0.3
+max_input_tokens = 2000
+classify_inbound = false
+classify_outbound = false
+auto_respond = false
+
+[llm.ollama]
+base_url = "http://localhost:11434"
+model = "llama3"
+
+[observability]
+log_format = "json"
+log_level = "info"
+metrics_endpoint = "0.0.0.0:9090"
+otlp_endpoint = ""
+tracing_sample_rate = 0.1
+
+[analytics]
+backend = "none"
+clickhouse_url = "http://localhost:8123"
+clickhouse_database = "sentio"
+
+[error_events]
+retention_days = 30

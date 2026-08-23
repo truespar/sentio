@@ -1,0 +1,94 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id, domain_id, tenant_id, address, display_name, status, forward_to, auto_reply, auto_reply_subject, auto_reply_body, metadata, created_at, updated_at FROM mailboxes WHERE tenant_id = $1 ORDER BY address",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "domain_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "tenant_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "address",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "display_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "status",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "forward_to",
+        "type_info": "TextArray"
+      },
+      {
+        "ordinal": 7,
+        "name": "auto_reply",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 8,
+        "name": "auto_reply_subject",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 9,
+        "name": "auto_reply_body",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 10,
+        "name": "metadata",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 11,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 12,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      true,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "2118fa537176fedc1ca5d4ec8cf46017f7503794ba8f6281c9fca2bd64cb2f14"
+}

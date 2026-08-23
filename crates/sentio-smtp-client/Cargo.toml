@@ -1,0 +1,53 @@
+[package]
+name = "sentio-smtp-client"
+description = "Outbound SMTP delivery with MX resolution and connection pooling"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[features]
+default = []
+test-support = []
+
+[dependencies]
+sentio-core.workspace = true
+sentio-auth.workspace = true
+sentio-queue.workspace = true
+sentio-store.workspace = true
+sentio-storage.workspace = true
+tokio.workspace = true
+tokio-rustls.workspace = true
+rustls.workspace = true
+rustls-pki-types.workspace = true
+webpki-roots.workspace = true
+hickory-resolver.workspace = true
+tracing.workspace = true
+mail-builder.workspace = true
+bytes.workspace = true
+memchr.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+uuid.workspace = true
+chrono.workspace = true
+thiserror.workspace = true
+sha2.workspace = true
+rand.workspace = true
+regex.workspace = true
+base64.workspace = true
+sentio-abuse.workspace = true
+
+[dev-dependencies]
+sentio-smtp-client = { path = ".", features = ["test-support"] }
+sentio-smtp-server = { workspace = true, features = ["test-support"] }
+sentio-storage = { workspace = true, features = ["test-support"] }
+sentio-queue = { workspace = true, features = ["test-support"] }
+sentio-store.workspace = true
+sentio-api.workspace = true
+rcgen.workspace = true
+tokio-rustls.workspace = true
+rustls.workspace = true
+rustls-pemfile.workspace = true
+sqlx.workspace = true
+tracing-subscriber.workspace = true
+reqwest.workspace = true
