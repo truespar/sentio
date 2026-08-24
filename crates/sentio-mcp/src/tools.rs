@@ -69,8 +69,26 @@ pub struct SendMessageParams {
 pub struct ReplyMessageParams {
     /// UUID of the inbound message to reply to
     pub id: String,
+    /// Sender address for the reply, e.g. agent@example.com (domain must exist in Sentio)
+    pub from: String,
     /// Reply body (plain text)
     pub text: String,
+    /// Reply body (HTML); included alongside text when provided
+    #[serde(default)]
+    pub html: Option<String>,
+    /// Additional CC recipients beyond the original sender
+    #[serde(default)]
+    pub cc: Vec<String>,
+}
+
+/// Extract the bare email address from a header_from value such as
+/// `"Jane Doe" <jane@example.com>`, `<jane@example.com>`, or `jane@example.com`.
+fn extract_address(header_from: &str) -> Option<String> {
+    if let Some(open) = header_from.rfind('<') {
+        let close = header_from[open..].find('>')?;
+        return Some(header_from[open + 1..open + close].trim().to_string());
+    }
+    Some(header_from.trim().to_string()).filter(|a| a.contains('@'))
 }
 
 #[derive(Debug, Deserialize, schemars::JsonSchema)]
@@ -151,15 +169,68 @@ impl SentioMcpServer {
     }
 
     /// Reply to an inbound message in-thread.
-    #[tool(description = "Reply to an inbound message in-thread")]
+    #[tool(description = "Reply to an inbound message in-thread: fetches the \
+         original message, addresses the reply to its sender, and sets the \
+         RFC 5322 In-Reply-To and References headers so mail clients thread it")]
     async fn reply_message(
         &self,
-        Parameters(_params): Parameters<ReplyMessageParams>,
+        Parameters(params): Parameters<ReplyMessageParams>,
     ) -> Result<String, McpError> {
-        // The reply endpoint composes In-Reply-To/References headers; the
-        // exact request shape is resolved against the OpenAPI spec during
-        // integration testing - placeholder until wired end-to-end.
-        Err(McpError::internal_error("not yet implemented", None))
+        let parent = self
+            .client
+            .get(&format!("/v1/messages/{}", params.id), &[])
+            .await
+            .map_err(|e| McpError::internal_error(e.message(), None))?
+            .get("data")
+            .cloned()
+            .unwrap_or_else(|| json!({}));
+
+        let in_reply_to = parent["message_id_header"]
+            .as_str()
+            .filter(|s| !s.is_empty())
+            .ok_or_else(|| {
+                McpError::internal_error(
+                    "original message has no Message-ID header; cannot thread a reply",
+                    None,
+                )
+            })?;
+
+        let header_from = parent["header_from"].as_str().unwrap_or_default();
+        let recipient = extract_address(header_from).ok_or_else(|| {
+            McpError::internal_error(
+                format!("could not determine reply address from original sender '{header_from}'"),
+                None,
+            )
+        })?;
+
+        let subject = match parent["subject"].as_str() {
+            Some(s) if s.to_ascii_lowercase().starts_with("re:") => s.to_string(),
+            Some(s) => format!("Re: {s}"),
+            None => "Re:".to_string(),
+        };
+
+        let body = json!({
+            "from": params.from,
+            "to": [recipient],
+            "cc": params.cc,
+            "subject": subject,
+            "text": params.text,
+            "html": params.html,
+            // Standard reply-construction: In-Reply-To is the parent's
+            // Message-ID; References chains ancestors oldest-first. The
+            // REST message payload does not expose the parent's own
+            // References chain, so the best available chain is the
+            // parent's Message-ID alone.
+            "in_reply_to": in_reply_to,
+            "references": [in_reply_to],
+        });
+
+        let resp = self
+            .client
+            .post("/v1/messages/send", body)
+            .await
+            .map_err(|e| McpError::internal_error(e.message(), None))?;
+        data(resp)
     }
 
     /// Create a mailbox on an owned domain.
@@ -217,5 +288,111 @@ impl ServerHandler for SentioMcpServer {
                 "Tools for sending, reading, and managing email via the Sentio API. \
                  Configure SENTIO_BASE_URL and SENTIO_API_KEY before starting.",
             )
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::extract_address;
+
+    #[test]
+    fn extracts_address_from_display_name_form() {
+        assert_eq!(
+            extract_address("\"Jane Doe\" <jane@example.com>"),
+            Some("jane@example.com".into())
+        );
+    }
+
+    #[test]
+    fn extracts_address_from_angle_bracketed_and_bare_forms() {
+        assert_eq!(
+            extract_address("<jane@example.com>"),
+            Some("jane@example.com".into())
+        );
+        assert_eq!(
+            extract_address(" jane@example.com "),
+            Some("jane@example.com".into())
+        );
+        assert_eq!(extract_address("no address here"), None);
+    }
+}
+
+#[cfg(test)]
+mod reply_tests {
+    use super::{ReplyMessageParams, SentioClient, SentioMcpServer};
+    use rmcp::handler::server::wrapper::Parameters;
+    use serde_json::json;
+    use wiremock::matchers::{method, path};
+    use wiremock::{Mock, MockServer, ResponseTemplate};
+
+    fn params(id: &str) -> Parameters<ReplyMessageParams> {
+        Parameters(ReplyMessageParams {
+            id: id.into(),
+            from: "agent@example.com".into(),
+            text: "Here it is.".into(),
+            html: None,
+            cc: vec![],
+        })
+    }
+
+    #[tokio::test]
+    async fn reply_threads_headers_and_addresses_original_sender() {
+        let server = MockServer::start().await;
+
+        Mock::given(method("GET"))
+            .and(path("/v1/messages/abc"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(json!({
+                "data": {
+                    "id": "abc",
+                    "message_id_header": "<parent@mail.example.com>",
+                    "header_from": "\"Jane Doe\" <jane@example.com>",
+                    "subject": "Quarterly report"
+                }
+            })))
+            .mount(&server)
+            .await;
+
+        Mock::given(method("POST"))
+            .and(path("/v1/messages/send"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(json!({
+                "data": {"id": "out-1", "status": "queued"}
+            })))
+            .mount(&server)
+            .await;
+
+        let mcp = SentioMcpServer::new(SentioClient::new(server.uri(), "key"));
+        let result = mcp.reply_message(params("abc")).await.unwrap();
+
+        assert!(result.contains("out-1"));
+        let body: serde_json::Value = server
+            .received_requests()
+            .await
+            .unwrap()
+            .into_iter()
+            .find(|req| req.url.path() == "/v1/messages/send")
+            .unwrap()
+            .body_json()
+            .unwrap();
+        assert_eq!(body["to"][0], "jane@example.com");
+        assert_eq!(body["in_reply_to"], "<parent@mail.example.com>");
+        assert_eq!(body["references"][0], "<parent@mail.example.com>");
+        assert_eq!(body["subject"], "Re: Quarterly report");
+    }
+
+    #[tokio::test]
+    async fn reply_fails_cleanly_without_message_id() {
+        let server = MockServer::start().await;
+        Mock::given(method("GET"))
+            .and(path("/v1/messages/xyz"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(json!({
+                "data": {"id": "xyz", "header_from": "a@b.c"}
+            })))
+            .mount(&server)
+            .await;
+
+        let mcp = SentioMcpServer::new(SentioClient::new(server.uri(), "key"));
+        let err = mcp.reply_message(params("xyz")).await.unwrap_err();
+
+        assert!(err.message.contains("Message-ID"));
     }
 }

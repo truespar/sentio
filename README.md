@@ -50,6 +50,7 @@ around someone else's API.
 - [Installing without Docker](#installing-without-docker) - requirements and manual setup
 - [Configuration](#configuration)
 - [API reference and testing UI](#api-reference-and-testing-ui) - browse and call every endpoint
+- [MCP: give agents email as native tools](#mcp-give-agents-email-as-native-tools) - sentio-mcp server
 - [Give an agent its own inbox](#give-an-agent-its-own-inbox) - the flagship walkthrough
 - [Building agents](docs/building-agents.md) - patterns for running agents in production
 - [Sending your first message](#sending-your-first-message)
@@ -439,6 +440,47 @@ Authorization: Bearer <your-api-key>
 ```
 
 ---
+
+## MCP: give agents email as native tools
+
+`sentio-mcp` is a standalone [Model Context Protocol](https://modelcontextprotocol.io)
+server that exposes the REST API as agent-callable tools, so MCP clients
+(Claude Desktop, Cursor, opencode, ...) get email capabilities with no glue
+code. It talks stdio, authenticates with a regular API key scoped to one
+tenant, and inherits all of Sentio's existing auth and rate limiting.
+
+| Tool | What it does |
+|---|---|
+| `list_messages` | List recent inbound/outbound messages |
+| `get_message` | Fetch one message by ID |
+| `send_message` | Send from an owned domain address |
+| `reply_message` | Reply in-thread (sets In-Reply-To/References) |
+| `list_mailboxes` | List mailboxes on a domain |
+| `create_mailbox` | Create a mailbox on an owned domain |
+
+Run it against your server:
+
+```bash
+SENTIO_BASE_URL="http://localhost:8080" \
+SENTIO_API_KEY="your-api-key" \
+./target/debug/sentio-mcp
+```
+
+Wire it into an MCP client config (example for Claude Desktop / opencode):
+
+```json
+{
+  "mcpServers": {
+    "sentio": {
+      "command": "/path/to/sentio-mcp",
+      "env": {
+        "SENTIO_BASE_URL": "http://localhost:8080",
+        "SENTIO_API_KEY": "your-api-key"
+      }
+    }
+  }
+}
+```
 
 ## Give an agent its own inbox
 
