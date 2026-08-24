@@ -102,7 +102,7 @@ curl localhost:8080/health/ready
 
 ### Bootstrap credentials
 
-Migration `007` seeds one admin tenant and one API key:
+Migration `002` seeds one admin tenant and one API key:
 
 | | |
 |---|---|

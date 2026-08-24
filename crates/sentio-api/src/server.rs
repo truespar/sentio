@@ -4,6 +4,7 @@ use std::str::FromStr;
 use sentio_core::error::SentioError;
 use tokio::net::TcpListener;
 
+use crate::auth::warn_if_bootstrap_key_active;
 use crate::routes;
 use crate::state::AppState;
 
@@ -17,6 +18,8 @@ pub async fn start(
     let addr = SocketAddr::from_str(listen_addr).map_err(|e| {
         SentioError::Validation(format!("invalid listen_api address '{listen_addr}': {e}"))
     })?;
+
+    warn_if_bootstrap_key_active(&state.pool).await;
 
     let app = routes::router(state);
 
