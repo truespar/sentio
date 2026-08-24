@@ -13,6 +13,7 @@ members = [
     "crates/sentio-storage",
     "crates/sentio-store",
     "crates/sentio-observe",
+    "crates/sentio-mcp",
 ]
 resolver = "2"
 
@@ -82,7 +83,7 @@ hickory-resolver = "0.26"
 axum = { version = "0.8", features = ["multipart"] }
 tower = "0.5"
 tower-http = "0.7"
-reqwest = { version = "0.13", features = ["json"] }
+reqwest = { version = "0.13", features = ["json", "query"] }
 
 # OpenAPI documentation
 utoipa = { version = "5", features = ["chrono", "uuid"] }
@@ -163,6 +164,10 @@ clap = { version = "4", features = ["derive"] }
 # Error handling
 thiserror = "2"
 anyhow = "1"
+
+# MCP
+rmcp = { version = "3.1", features = ["server", "transport-io"] }
+schemars = "1"
 
 # Testing
 rcgen = "0.14"
