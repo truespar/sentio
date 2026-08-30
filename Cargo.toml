@@ -131,7 +131,7 @@ subtle = "2.5"
 uuid = { version = "1", features = ["v4", "v7", "serde"] }
 rustls-pki-types = "1"
 rustls-pemfile = "2"
-argon2 = "0.5"
+argon2 = "0.6"
 ed25519-dalek = { version = "3", features = ["rand_core"] }
 rsa = { version = "0.9", features = ["pkcs5"] }
 
