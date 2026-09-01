@@ -130,7 +130,7 @@ jobs:
       contents: read
       packages: write
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           path: /tmp/digests
           pattern: digests-*
@@ -212,7 +212,7 @@ jobs:
 
       # The Windows binary is a real cargo build on a Windows runner; it cannot
       # come out of the Linux images like the other two.
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: windows-binary
           path: dist
