@@ -208,7 +208,13 @@ max_per_second_per_endpoint = 100
 
 [llm]
 # No LLM host in the OSS stack. Set enabled = true and point at OpenAI, an
-# Ollama instance, or Anthropic to turn on LLM classification.
+# Ollama instance, Anthropic, or TypeSafe Jev to turn on LLM classification.
+#
+# provider = "jev" is a different kind of backend: a structured-decision model
+# that answers typed questions with calibrated probabilities instead of writing
+# text. It is the only provider that moves the spam score - the chat providers
+# classify into a category and leave the score alone. It cannot write replies,
+# so auto_respond = true with provider = "jev" is refused at startup.
 enabled = false
 provider = "openai"
 model = "gpt-4o-mini"
@@ -223,6 +229,37 @@ auto_respond = false
 [llm.ollama]
 base_url = "http://localhost:11434"
 model = "llama3"
+
+# Only consulted when provider = "jev". To use it:
+#
+#   [llm]
+#   enabled = true
+#   provider = "jev"
+#   model = "jev-latest"
+#   api_key_env = "SENTIO_JEV_API_KEY"
+#   classify_inbound = true
+#   auto_respond = false          # required: Jev emits no text
+#
+[llm.jev]
+# How much of the message body leaves your server:
+#   "none"    - envelope and subject only
+#   "preview" - the first preview_tokens of the body (default)
+#   "full"    - up to max_body_tokens
+# A preview is still tenant content, just bounded. Set "none" to keep bodies
+# in-house at the cost of the body signal.
+body_mode = "preview"
+preview_tokens = 120
+max_body_tokens = 1500
+# Answers below this confidence are dropped rather than applied weakly.
+min_confidence = 0.5
+# Largest adjustment in either direction, in spam-score points. The two weights
+# below sum to this on purpose: a fully confident verdict lands exactly on the
+# limit and anything less certain scales below it.
+max_score_delta = 4.0
+unsolicited_weight = 1.5
+phishing_weight = 2.5
+# Total attempts on a transient failure (429, 503, 529).
+max_attempts = 3
 
 [observability]
 log_format = "json"

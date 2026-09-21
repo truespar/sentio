@@ -5,7 +5,8 @@ use sentio_core::error::SentioError;
 
 use crate::scoring::{extract_json, log_token_usage, truncate_to_tokens};
 use crate::traits::{
-    AutoRespondConfig, AutoResponseResult, ClassifyResult, LlmProvider, MessageCategory, TokenUsage,
+    AutoRespondConfig, AutoResponseResult, ClassifyResult, MessageCategory, MessageClassifier,
+    ResponseGenerator, TokenUsage,
 };
 
 const CLASSIFICATION_SYSTEM: &str =
@@ -286,7 +287,7 @@ impl OpenAiProvider {
     }
 }
 
-impl LlmProvider for OpenAiProvider {
+impl MessageClassifier for OpenAiProvider {
     async fn classify(
         &self,
         message_text: &str,
@@ -326,7 +327,9 @@ impl LlmProvider for OpenAiProvider {
             token_usage: usage,
         })
     }
+}
 
+impl ResponseGenerator for OpenAiProvider {
     async fn generate_auto_response(
         &self,
         message_text: &str,

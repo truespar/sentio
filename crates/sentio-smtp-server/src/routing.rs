@@ -10,7 +10,7 @@ use sentio_core::traits::{
     BlobStore, InboundRouteDeliveryLogRepository, InboundRouteRecord, InboundRouteRepository,
     MessageEventRepository, MessageRepository, NewInboundRouteDeliveryLog, NewMessageEvent,
 };
-use sentio_llm::traits::LlmProvider;
+use sentio_llm::traits::MessageClassifier;
 use sentio_llm::LlmBackend;
 use sentio_queue::consumer::{HandlerResult, MessageHandler, QueueMessage};
 use serde::{Deserialize, Serialize};

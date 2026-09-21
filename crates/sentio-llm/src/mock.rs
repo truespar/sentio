@@ -3,7 +3,8 @@ use std::sync::{Arc, Mutex};
 use sentio_core::error::SentioError;
 
 use crate::traits::{
-    AutoRespondConfig, AutoResponseResult, ClassifyResult, LlmProvider, MessageCategory, TokenUsage,
+    AutoRespondConfig, AutoResponseResult, ClassifyResult, MessageCategory, MessageClassifier,
+    ResponseGenerator, TokenUsage,
 };
 
 /// Mock LLM provider for testing. Returns configurable results.
@@ -59,7 +60,7 @@ impl Default for MockLlmProvider {
     }
 }
 
-impl LlmProvider for MockLlmProvider {
+impl MessageClassifier for MockLlmProvider {
     async fn classify(
         &self,
         _message_text: &str,
@@ -72,7 +73,9 @@ impl LlmProvider for MockLlmProvider {
             Err(msg) => Err(SentioError::Internal(msg.clone())),
         }
     }
+}
 
+impl ResponseGenerator for MockLlmProvider {
     async fn generate_auto_response(
         &self,
         _message_text: &str,

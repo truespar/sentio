@@ -5,7 +5,8 @@ use sentio_core::error::SentioError;
 
 use crate::scoring::{extract_json, log_token_usage, truncate_to_tokens};
 use crate::traits::{
-    AutoRespondConfig, AutoResponseResult, ClassifyResult, LlmProvider, MessageCategory, TokenUsage,
+    AutoRespondConfig, AutoResponseResult, ClassifyResult, MessageCategory, MessageClassifier,
+    ResponseGenerator, TokenUsage,
 };
 
 const CLASSIFICATION_PROMPT: &str = r#"Analyze the email below and respond with ONLY a JSON object (no markdown, no explanation) with these fields:
@@ -163,7 +164,7 @@ impl AnthropicProvider {
     }
 }
 
-impl LlmProvider for AnthropicProvider {
+impl MessageClassifier for AnthropicProvider {
     async fn classify(
         &self,
         message_text: &str,
@@ -205,7 +206,9 @@ impl LlmProvider for AnthropicProvider {
             token_usage: usage,
         })
     }
+}
 
+impl ResponseGenerator for AnthropicProvider {
     async fn generate_auto_response(
         &self,
         message_text: &str,

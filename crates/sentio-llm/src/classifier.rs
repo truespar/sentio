@@ -1,7 +1,7 @@
 use sentio_core::config::{LlmConfig, SpamConfig};
 use sentio_core::error::SentioError;
 
-use crate::traits::{ClassifyResult, LlmProvider};
+use crate::traits::{ClassifyResult, MessageClassifier};
 
 /// Outcome of the borderline classification pipeline.
 #[derive(Debug, Clone)]
@@ -23,7 +23,7 @@ pub struct ClassificationOutcome {
 ///
 /// Returns `ClassificationOutcome` with whether the LLM was consulted and
 /// the adjusted score (original + score_delta from LLM).
-pub async fn classify_if_borderline<P: LlmProvider>(
+pub async fn classify_if_borderline<P: MessageClassifier>(
     provider: &P,
     llm_config: &LlmConfig,
     spam_config: &SpamConfig,

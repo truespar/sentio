@@ -11,9 +11,12 @@ use sentio_core::config::LlmConfig;
 use sentio_core::error::SentioError;
 
 use crate::providers::anthropic::AnthropicProvider;
+use crate::providers::jev::JevProvider;
 use crate::providers::ollama::OllamaProvider;
 use crate::providers::openai::OpenAiProvider;
-use crate::traits::{AutoRespondConfig, AutoResponseResult, ClassifyResult, LlmProvider};
+use crate::traits::{
+    AutoRespondConfig, AutoResponseResult, ClassifyResult, MessageClassifier, ResponseGenerator,
+};
 
 /// Enum-based dispatch for LLM provider backends.
 ///
@@ -25,10 +28,12 @@ pub enum LlmBackend {
     Anthropic(AnthropicProvider),
     OpenAi(OpenAiProvider),
     Ollama(OllamaProvider),
+    /// Classification only - Jev returns typed decisions, never prose.
+    Jev(JevProvider),
     Noop(NoopLlmProvider),
 }
 
-impl LlmProvider for LlmBackend {
+impl MessageClassifier for LlmBackend {
     async fn classify(
         &self,
         message_text: &str,
@@ -39,10 +44,13 @@ impl LlmProvider for LlmBackend {
             Self::Anthropic(p) => p.classify(message_text, envelope_from, envelope_to).await,
             Self::OpenAi(p) => p.classify(message_text, envelope_from, envelope_to).await,
             Self::Ollama(p) => p.classify(message_text, envelope_from, envelope_to).await,
+            Self::Jev(p) => p.classify(message_text, envelope_from, envelope_to).await,
             Self::Noop(p) => p.classify(message_text, envelope_from, envelope_to).await,
         }
     }
+}
 
+impl ResponseGenerator for LlmBackend {
     async fn generate_auto_response(
         &self,
         message_text: &str,
@@ -52,6 +60,13 @@ impl LlmProvider for LlmBackend {
             Self::Anthropic(p) => p.generate_auto_response(message_text, config).await,
             Self::OpenAi(p) => p.generate_auto_response(message_text, config).await,
             Self::Ollama(p) => p.generate_auto_response(message_text, config).await,
+            // Unreachable in practice: create_backend refuses this pairing at
+            // startup, so an operator hears about it at boot, not per message.
+            Self::Jev(_) => Err(SentioError::Internal(
+                "the jev provider cannot generate replies; set llm.auto_respond = false \
+                 or pick a provider that generates text"
+                    .to_string(),
+            )),
             Self::Noop(p) => p.generate_auto_response(message_text, config).await,
         }
     }
@@ -70,6 +85,18 @@ pub fn create_backend(config: &LlmConfig) -> Result<LlmBackend, SentioError> {
         "anthropic" => Ok(LlmBackend::Anthropic(AnthropicProvider::new(config)?)),
         "openai" => Ok(LlmBackend::OpenAi(OpenAiProvider::new(config)?)),
         "ollama" => Ok(LlmBackend::Ollama(OllamaProvider::new(config)?)),
+        "jev" => {
+            // Fail at startup rather than on the first message that needs a
+            // reply: Jev is a structured-decision model with no text output.
+            if config.auto_respond {
+                return Err(SentioError::Internal(
+                    "llm.provider = \"jev\" cannot be combined with llm.auto_respond = true: \
+                     Jev returns typed decisions, not text"
+                        .to_string(),
+                ));
+            }
+            Ok(LlmBackend::Jev(JevProvider::new(config)?))
+        }
         other => Err(SentioError::Internal(format!(
             "unknown LLM provider: '{other}'"
         ))),
@@ -80,7 +107,7 @@ pub fn create_backend(config: &LlmConfig) -> Result<LlmBackend, SentioError> {
 #[derive(Debug, Clone)]
 pub struct NoopLlmProvider;
 
-impl LlmProvider for NoopLlmProvider {
+impl MessageClassifier for NoopLlmProvider {
     async fn classify(
         &self,
         _message_text: &str,
@@ -94,7 +121,9 @@ impl LlmProvider for NoopLlmProvider {
             token_usage: traits::TokenUsage::default(),
         })
     }
+}
 
+impl ResponseGenerator for NoopLlmProvider {
     async fn generate_auto_response(
         &self,
         _message_text: &str,

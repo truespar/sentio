@@ -8,24 +8,37 @@ use sentio_core::error::SentioError;
 // LlmProvider trait
 // ──────────────────────────────────────────────────────────────────────────────
 
-/// Trait for LLM providers that can classify messages and generate auto-responses.
+/// Classify a message into a category and a spam-score adjustment.
+///
+/// Split out from `LlmProvider` because not every backend generates text. A
+/// structured-decision model returns a typed choice and nothing else, so it can
+/// classify but cannot write a reply.
 ///
 /// Uses RPITIT (return-position `impl Trait` in traits) instead of `#[async_trait]`,
 /// matching the codebase convention used by `SpamScorer` and other traits.
-pub trait LlmProvider: Send + Sync {
+pub trait MessageClassifier: Send + Sync {
     fn classify(
         &self,
         message_text: &str,
         envelope_from: &str,
         envelope_to: &str,
     ) -> impl Future<Output = Result<ClassifyResult, SentioError>> + Send;
+}
 
+/// Write a reply to a message.
+pub trait ResponseGenerator: Send + Sync {
     fn generate_auto_response(
         &self,
         message_text: &str,
         config: &AutoRespondConfig,
     ) -> impl Future<Output = Result<AutoResponseResult, SentioError>> + Send;
 }
+
+/// A backend that does both. Existing providers implement it through the
+/// blanket impl below; nothing needs to name it explicitly.
+pub trait LlmProvider: MessageClassifier + ResponseGenerator {}
+
+impl<T: MessageClassifier + ResponseGenerator> LlmProvider for T {}
 
 // ──────────────────────────────────────────────────────────────────────────────
 // MessageCategory

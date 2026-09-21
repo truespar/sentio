@@ -855,6 +855,9 @@ pub struct LlmConfig {
     pub openai_api: String,
     #[serde(default)]
     pub ollama: OllamaConfig,
+    /// Only consulted when `provider = "jev"`.
+    #[serde(default)]
+    pub jev: JevConfig,
 }
 
 fn default_openai_api() -> String {
@@ -876,6 +879,99 @@ impl Default for LlmConfig {
             auto_respond: false,
             openai_api: default_openai_api(),
             ollama: OllamaConfig::default(),
+            jev: JevConfig::default(),
+        }
+    }
+}
+
+/// Tunables for the TypeSafe Jev provider.
+///
+/// Jev answers typed questions with calibrated probabilities, so unlike the
+/// chat providers it can move the spam score. These values decide how far.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JevConfig {
+    /// How much of the message body leaves the server:
+    ///
+    /// - `"none"` - envelope and subject only. No body content at all.
+    /// - `"preview"` - the first `preview_tokens` of the body (default).
+    ///   Still tenant content, just bounded.
+    /// - `"full"` - up to `max_body_tokens`.
+    ///
+    /// A bool used to stand here, which read as though "off" kept the body
+    /// local. It did not: a preview is a truncation of the body, not metadata.
+    #[serde(default = "default_jev_body_mode")]
+    pub body_mode: String,
+    /// Preview size when `body_mode = "preview"`.
+    #[serde(default = "default_jev_preview_tokens")]
+    pub preview_tokens: u32,
+    /// Body cap when `body_mode = "full"`. Also bounded by
+    /// `llm.max_input_tokens`.
+    #[serde(default = "default_jev_max_body_tokens")]
+    pub max_body_tokens: u32,
+    /// Answers below this confidence are discarded rather than applied
+    /// weakly - an uncertain model should not nudge a borderline message.
+    #[serde(default = "default_jev_min_confidence")]
+    pub min_confidence: f64,
+    /// Largest adjustment in either direction, in spam-score points.
+    #[serde(default = "default_jev_max_score_delta")]
+    pub max_score_delta: f64,
+    /// Weight on the "unsolicited bulk or scam" probability.
+    ///
+    /// The two weights sum to `max_score_delta` on purpose: a fully confident
+    /// verdict then lands exactly on the limit, and everything less certain
+    /// scales below it. Weights summing past the clamp would make every
+    /// confident answer saturate, throwing away the gradation that makes a
+    /// calibrated probability worth having.
+    #[serde(default = "default_jev_unsolicited_weight")]
+    pub unsolicited_weight: f64,
+    /// Weight on the "phishing or impersonation" probability. Higher than
+    /// unsolicited: a false negative here costs more than a missed newsletter.
+    #[serde(default = "default_jev_phishing_weight")]
+    pub phishing_weight: f64,
+    /// Total attempts for a transient failure (429 rate limited, 503, 529
+    /// overloaded). Observed in testing: the service returns these often
+    /// enough that a single attempt drops classifications that a second
+    /// attempt a moment later would have got.
+    #[serde(default = "default_jev_max_attempts")]
+    pub max_attempts: u32,
+}
+
+fn default_jev_body_mode() -> String {
+    "preview".to_string()
+}
+fn default_jev_preview_tokens() -> u32 {
+    120
+}
+fn default_jev_max_body_tokens() -> u32 {
+    1500
+}
+fn default_jev_min_confidence() -> f64 {
+    0.5
+}
+fn default_jev_max_score_delta() -> f64 {
+    4.0
+}
+fn default_jev_max_attempts() -> u32 {
+    3
+}
+fn default_jev_unsolicited_weight() -> f64 {
+    1.5
+}
+fn default_jev_phishing_weight() -> f64 {
+    2.5
+}
+
+impl Default for JevConfig {
+    fn default() -> Self {
+        Self {
+            body_mode: default_jev_body_mode(),
+            preview_tokens: default_jev_preview_tokens(),
+            max_body_tokens: default_jev_max_body_tokens(),
+            min_confidence: default_jev_min_confidence(),
+            max_score_delta: default_jev_max_score_delta(),
+            unsolicited_weight: default_jev_unsolicited_weight(),
+            phishing_weight: default_jev_phishing_weight(),
+            max_attempts: default_jev_max_attempts(),
         }
     }
 }

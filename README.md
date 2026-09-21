@@ -896,7 +896,7 @@ A Rust workspace of 13 crates:
 | `sentio-storage` | S3-compatible blob storage, ClamAV scanning |
 | `sentio-spam` | rspamd integration and the built-in scoring engine |
 | `sentio-abuse` | Rate limiting, IP bans, greylisting, reputation |
-| `sentio-llm` | LLM classification (Anthropic, OpenAI, Ollama) |
+| `sentio-llm` | LLM classification (Anthropic, OpenAI, Ollama, TypeSafe Jev) |
 | `sentio-webhooks` | HMAC-signed event dispatch with retries |
 | `sentio-observe` | Structured logging, Prometheus metrics, OpenTelemetry |
 | `sentio-api` | Axum REST API with generated OpenAPI |
@@ -912,6 +912,20 @@ cheap ones could not decide:
    scoring outside the configurable review band (`score_llm_review_min`..
    `score_llm_review_max`, 4.0-6.0 by default), so clear ham and clear spam
    never reach a model.
+
+Four backends serve that third tier. Anthropic, OpenAI and Ollama classify a
+message into a category. **TypeSafe Jev** (`provider = "jev"`) is a
+structured-decision model: it answers typed questions with calibrated
+probabilities rather than prose, so it is the only backend that also adjusts
+the spam score. A confident verdict moves a borderline message clear of the
+band in either direction; an unconfident one is discarded rather than applied
+weakly. Being decision-only, it cannot write replies, so pairing it with
+`auto_respond` is refused at startup.
+
+`body_mode` decides how much of a message leaves your server - `"none"`
+(envelope and subject), `"preview"` (a bounded slice, the default) or
+`"full"`. See `[llm.jev]` in [`config/oss.toml`](config/oss.toml) for the
+weights, confidence floor and retry budget.
 
 **Standards.** Core SMTP (RFC 5321/5322 and the ESMTP extensions), transport
 security (STARTTLS, MTA-STS, DANE, TLS-RPT), authentication (SASL, DKIM, SPF,
