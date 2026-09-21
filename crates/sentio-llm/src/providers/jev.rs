@@ -34,6 +34,11 @@ use crate::traits::{ClassifyResult, MessageCategory, MessageClassifier, TokenUsa
 const DEFAULT_BASE_URL: &str = "https://api.typesafe.ai";
 const DEFAULT_MODEL: &str = "jev-latest";
 const REQUEST_TIMEOUT: Duration = Duration::from_secs(20);
+/// First retry delay; doubles per attempt.
+const RETRY_BASE_BACKOFF: Duration = Duration::from_millis(300);
+/// Ceiling on a single backoff, so a large `max_attempts` cannot park a
+/// message behind a struggling third party.
+const RETRY_MAX_BACKOFF: Duration = Duration::from_secs(5);
 
 /// Question keys. The answer map comes back under the keys we send.
 const Q_CATEGORY: &str = "category";
@@ -156,10 +161,17 @@ impl JevProvider {
         })
     }
 
-    /// Retries only what is worth retrying. A 401 or 422 will fail the same
-    /// way every time; 429, 503 and 529 are capacity and clear on their own.
+    /// Retries only what is worth retrying. A 401 (bad key) or 422 (malformed
+    /// question) fails the same way every time.
+    ///
+    /// Their reference documents 401, 422, 429 and 529 only. The 500 and 503
+    /// here are undocumented but observed: a request the docs call valid - a
+    /// noul with no `criteria`, which their reference marks optional - came
+    /// back 500 after 33 seconds, and a later valid request got 503 "no
+    /// healthy upstream". Classification has no side effects beyond billing,
+    /// so repeating one is safe.
     fn is_transient(status: u16) -> bool {
-        matches!(status, 429 | 503 | 529)
+        matches!(status, 429 | 500 | 503 | 529)
     }
 
     async fn ask(&self, state: Value) -> Result<JevResponse, SentioError> {
@@ -179,10 +191,16 @@ impl JevProvider {
                     );
                     last = Some(e);
                     if attempt < attempts {
-                        // Short linear backoff. The pipeline is already behind a
-                        // queue, and a classification is not worth holding a
-                        // message for long.
-                        tokio::time::sleep(Duration::from_millis(400 * attempt as u64)).await;
+                        // Exponential, as their reference asks for: "retry the
+                        // request with exponential backoff instead of retrying
+                        // immediately". Starts short because the pipeline is
+                        // already behind a queue and a classification is not
+                        // worth holding a message for long: 300ms, 600ms,
+                        // 1200ms, capped.
+                        let backoff = RETRY_BASE_BACKOFF
+                            .saturating_mul(1u32 << (attempt - 1).min(6))
+                            .min(RETRY_MAX_BACKOFF);
+                        tokio::time::sleep(backoff).await;
                     }
                 }
             }
@@ -729,6 +747,22 @@ mod tests {
         assert_eq!(server.received_requests().await.unwrap().len(), 2);
     }
 
+    /// The undocumented statuses are the ones actually seen in the wild, so
+    /// pin which codes retry and which do not.
+    #[test]
+    fn transient_covers_the_statuses_observed_not_just_the_documented_ones() {
+        // Documented as retryable.
+        assert!(JevProvider::is_transient(429));
+        assert!(JevProvider::is_transient(529));
+        // Undocumented, but observed from the live service.
+        assert!(JevProvider::is_transient(500));
+        assert!(JevProvider::is_transient(503));
+        // Deterministic: retrying changes nothing.
+        assert!(!JevProvider::is_transient(401));
+        assert!(!JevProvider::is_transient(422));
+        assert!(!JevProvider::is_transient(400));
+    }
+
     /// A bad key fails the same way every time, so retrying it just wastes
     /// time on every message.
     #[tokio::test]
@@ -750,6 +784,40 @@ mod tests {
             1,
             "401 must not be retried"
         );
+    }
+
+    /// Their reference asks for exponential backoff, so measure that the gaps
+    /// actually grow rather than trusting the arithmetic.
+    #[tokio::test]
+    async fn backoff_grows_between_attempts() {
+        let server = MockServer::start().await;
+        Mock::given(method("POST"))
+            .respond_with(ResponseTemplate::new(529))
+            .mount(&server)
+            .await;
+
+        std::env::set_var("SENTIO_TEST_JEV_KEY", "test-key");
+        let mut cfg = config(&server.uri());
+        cfg.jev.max_attempts = 3;
+        let p = JevProvider::new(&cfg).unwrap();
+
+        let started = std::time::Instant::now();
+        let _ = p
+            .classify("Subject: x\r\n\r\ny", "a@b.test", "c@d.test")
+            .await;
+        let elapsed = started.elapsed();
+
+        // Two sleeps between three attempts: 300ms then 600ms.
+        assert!(
+            elapsed >= Duration::from_millis(900),
+            "expected at least 900ms of backoff, took {elapsed:?}"
+        );
+        // Guards against an accidental multiplication blow-up.
+        assert!(
+            elapsed < Duration::from_secs(5),
+            "backoff ran long: {elapsed:?}"
+        );
+        assert_eq!(server.received_requests().await.unwrap().len(), 3);
     }
 
     #[tokio::test]

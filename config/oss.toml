@@ -230,7 +230,14 @@ auto_respond = false
 base_url = "http://localhost:11434"
 model = "llama3"
 
-# Only consulted when provider = "jev". To use it:
+# Only consulted when provider = "jev".
+#
+# Jev is closed-weight and hosted only - no self-host path, unlike Ollama. It
+# also proved unreliable in testing (429, 500, 503, 529; the last two are not
+# in their error reference), hence max_attempts below. A failed classification
+# is skipped, never fatal to delivery.
+#
+# To use it:
 #
 #   [llm]
 #   enabled = true

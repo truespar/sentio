@@ -927,6 +927,17 @@ weakly. Being decision-only, it cannot write replies, so pairing it with
 `"full"`. See `[llm.jev]` in [`config/oss.toml`](config/oss.toml) for the
 weights, confidence floor and retry budget.
 
+Know what you are taking on before enabling it. Jev is closed-weight and
+hosted only: there is no published weight file, parameter count or self-host
+path, so unlike the Ollama backend you cannot run it yourself. During
+development the service returned 429, 500, 503 and 529 - two of those
+undocumented - so the provider retries transient statuses with exponential
+backoff, and a failed classification is logged and skipped rather than
+allowed to affect delivery. `base_url` is configurable if you would rather
+reach the model through a gateway, or point at a compatible endpoint of your
+own; neither is tested here. All of which is why the whole tier is opt-in and
+the default provider is not Jev.
+
 **Standards.** Core SMTP (RFC 5321/5322 and the ESMTP extensions), transport
 security (STARTTLS, MTA-STS, DANE, TLS-RPT), authentication (SASL, DKIM, SPF,
 DMARC, ARC, BIMI), and deliverability (one-click unsubscribe, FBL/ARF, BATV,
