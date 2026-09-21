@@ -462,7 +462,7 @@ Every release ships `sentio-mcp` as its own archive for Linux x86_64, Linux
 aarch64 and Windows x86_64, so an MCP client host needs no Rust toolchain:
 
 ```bash
-VERSION=0.1.5   # or whatever the latest release tag is
+VERSION=0.1.6   # or whatever the latest release tag is
 curl -LO "https://github.com/truespar/sentio/releases/download/v${VERSION}/sentio-mcp-${VERSION}-x86_64-unknown-linux-gnu.tar.gz"
 tar -xzf sentio-mcp-*.tar.gz
 ```

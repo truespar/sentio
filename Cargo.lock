@@ -4046,7 +4046,7 @@ checksum = "8a7852d02fc848982e0c167ef163aaff9cd91dc640ba85e263cb1ce46fae51cd"
 
 [[package]]
 name = "sentio-abuse"
-version = "0.1.5"
+version = "0.1.6"
 dependencies = [
  "chrono",
  "hickory-resolver",
@@ -4062,7 +4062,7 @@ dependencies = [
 
 [[package]]
 name = "sentio-api"
-version = "0.1.5"
+version = "0.1.6"
 dependencies = [
  "argon2",
  "axum",
@@ -4110,7 +4110,7 @@ dependencies = [
 
 [[package]]
 name = "sentio-auth"
-version = "0.1.5"
+version = "0.1.6"
 dependencies = [
  "base64 0.23.1",
  "chrono",
@@ -4129,7 +4129,7 @@ dependencies = [
 
 [[package]]
 name = "sentio-core"
-version = "0.1.5"
+version = "0.1.6"
 dependencies = [
  "bytes",
  "chrono",
@@ -4149,7 +4149,7 @@ dependencies = [
 
 [[package]]
 name = "sentio-llm"
-version = "0.1.5"
+version = "0.1.6"
 dependencies = [
  "reqwest",
  "sentio-core",
@@ -4163,7 +4163,7 @@ dependencies = [
 
 [[package]]
 name = "sentio-mcp"
-version = "0.1.5"
+version = "0.1.6"
 dependencies = [
  "reqwest",
  "rmcp",
@@ -4180,7 +4180,7 @@ dependencies = [
 
 [[package]]
 name = "sentio-observe"
-version = "0.1.5"
+version = "0.1.6"
 dependencies = [
  "metrics",
  "metrics-exporter-prometheus",
@@ -4193,7 +4193,7 @@ dependencies = [
 
 [[package]]
 name = "sentio-queue"
-version = "0.1.5"
+version = "0.1.6"
 dependencies = [
  "async-nats",
  "bytes",
@@ -4212,7 +4212,7 @@ dependencies = [
 
 [[package]]
 name = "sentio-smtp"
-version = "0.1.5"
+version = "0.1.6"
 dependencies = [
  "chrono",
  "clap",
@@ -4238,7 +4238,7 @@ dependencies = [
 
 [[package]]
 name = "sentio-smtp-client"
-version = "0.1.5"
+version = "0.1.6"
 dependencies = [
  "base64 0.23.1",
  "bytes",
@@ -4277,7 +4277,7 @@ dependencies = [
 
 [[package]]
 name = "sentio-smtp-server"
-version = "0.1.5"
+version = "0.1.6"
 dependencies = [
  "argon2",
  "base64 0.23.1",
@@ -4318,7 +4318,7 @@ dependencies = [
 
 [[package]]
 name = "sentio-spam"
-version = "0.1.5"
+version = "0.1.6"
 dependencies = [
  "regex",
  "reqwest",
@@ -4335,7 +4335,7 @@ dependencies = [
 
 [[package]]
 name = "sentio-storage"
-version = "0.1.5"
+version = "0.1.6"
 dependencies = [
  "aws-config",
  "aws-credential-types",
@@ -4358,7 +4358,7 @@ dependencies = [
 
 [[package]]
 name = "sentio-store"
-version = "0.1.5"
+version = "0.1.6"
 dependencies = [
  "base64 0.23.1",
  "chrono",
@@ -4379,7 +4379,7 @@ dependencies = [
 
 [[package]]
 name = "sentio-webhooks"
-version = "0.1.5"
+version = "0.1.6"
 dependencies = [
  "axum",
  "chrono",

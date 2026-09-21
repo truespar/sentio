@@ -7,6 +7,42 @@ reaches 1.0.
 
 ## [Unreleased]
 
+## [0.1.6] - 2026-09-21
+
+### Added
+- TypeSafe Jev as a fourth classification backend (`llm.provider = "jev"`). A
+  structured-decision model: typed questions in, calibrated probabilities out.
+  It is the first provider that returns a real `score_delta` - the three chat
+  providers all left the spam score untouched - so a confident verdict moves a
+  borderline message clear of the review band. `llm.jev.body_mode` decides
+  whether the envelope, a bounded preview or the full body leaves the server.
+- `scripts/check.sh`, which runs every check that has to pass before a change
+  lands: formatting, clippy, tests, release build, `cargo deny`, the
+  third-party notices diff and the OpenAPI spec diff.
+- `scripts/install-git-hooks.sh`, a pre-push hook for formatting and lints.
+
+### Changed
+- `LlmProvider` split into `MessageClassifier` and `ResponseGenerator`. A
+  decision model can classify but cannot write text, so the two capabilities
+  are no longer one trait. `LlmProvider` remains as a supertrait with a
+  blanket impl, so existing providers are unaffected.
+- Dependency updates: argon2 0.6 (its API moved `SaltString` and now draws the
+  salt itself), mail-auth 0.13, mail-builder 1.0, rmcp, and 18 crates in the
+  grouped update. Release archives now also carry the notices for
+  `sentio-mcp`'s dependencies.
+- Hosted CI removed. `scripts/check.sh` is the gate; `publish.yml` still
+  builds and publishes releases on a tag.
+- Dependabot groups all ecosystems and runs monthly.
+
+### Fixed
+- **rustls 0.23.43 to 0.23.45**, covering RUSTSEC-2026-0285: TLS 1.3 handshake
+  messages were accepted across encryption level boundaries. This affects
+  STARTTLS and SMTPS.
+- Two flaky checks in the end-to-end harness: the webhook test left a
+  subscription behind on every run, so later runs verified deliveries against
+  the wrong signing secret, and the inbound test grepped the log for a generic
+  success line that could match a previous run.
+
 ## [0.1.5] - 2026-08-24
 
 ### Added
