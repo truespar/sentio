@@ -1,15 +1,34 @@
 version: 2
+
+# Grouped and monthly, deliberately. Ungrouped weekly updates produced six open
+# pull requests in a month, four of them one-line action bumps, which is enough
+# noise that the two that mattered got lost in it.
+#
+# Security updates are a separate channel and are unaffected by this schedule:
+# they still open as soon as an advisory lands.
 updates:
   - package-ecosystem: cargo
     directory: "/"
-    schedule: {interval: weekly}
-    open-pull-requests-limit: 5
+    schedule: {interval: monthly}
+    open-pull-requests-limit: 3
     groups:
-      patch-and-minor:
-        update-types: [minor, patch]
+      # Majors are grouped too. A breaking bump needs review either way, and
+      # one pull request that fails is easier to work through than five.
+      cargo:
+        patterns: ["*"]
+
   - package-ecosystem: github-actions
     directory: "/"
     schedule: {interval: monthly}
+    open-pull-requests-limit: 1
+    groups:
+      actions:
+        patterns: ["*"]
+
   - package-ecosystem: docker
     directory: "/"
     schedule: {interval: monthly}
+    open-pull-requests-limit: 1
+    groups:
+      docker:
+        patterns: ["*"]
