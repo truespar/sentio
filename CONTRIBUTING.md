@@ -30,21 +30,31 @@ cargo clippy --workspace --all-targets  # lints
 cargo fmt --all                    # formatting
 ```
 
-To have the first two run automatically before every push:
+Or run every check that has to pass, in one go:
+
+```bash
+./scripts/check.sh                # fmt, clippy, tests, release build,
+                                  # cargo-deny, notices, OpenAPI spec
+./scripts/check.sh fmt clippy     # or just the ones you want
+```
+
+There is no hosted CI on this repository, so that script is the gate: nothing
+runs it for you when you push or open a pull request. Run it before asking for
+a review, and expect a reviewer to run it too.
+
+To have formatting and lints checked automatically before every push:
 
 ```bash
 ./scripts/install-git-hooks.sh
 ```
 
-CI runs on pull requests and on `main`, not on every branch push, so a branch
-without a pull request is not checked for you. `git push --no-verify` skips the
-hook when you need it to.
+`git push --no-verify` skips the hook when you need it to.
 
 ## SQL and the offline cache
 
 Queries are checked at compile time by `sqlx`. The committed `.sqlx/` directory
 lets the workspace build without a database, which is what makes the Docker
-build and CI work.
+build work without spinning up PostgreSQL first.
 
 If you add or change a query you must regenerate that cache against a live
 database, and commit the result:
@@ -89,7 +99,7 @@ cargo run -- openapi > docs/openapi.json
 ```
 
 The subcommand needs no configuration, database, or network - the document is
-static - so it also works in CI.
+static - so it runs anywhere the binary builds.
 
 ## Testing
 
@@ -108,7 +118,7 @@ See [`docs/testing.md`](docs/testing.md).
 
 ## Licences and third-party notices
 
-Two separate things, both enforced in CI:
+Two separate things, both checked by `./scripts/check.sh`:
 
 - **Policy** - `deny.toml` lists which licences may appear in the dependency
   graph. `cargo deny check` fails on anything else, so a new dependency with an
