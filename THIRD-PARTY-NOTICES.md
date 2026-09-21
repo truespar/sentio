@@ -8041,7 +8041,7 @@ limitations under the License.
 
 ## Apache License 2.0
 
-Used by `arc-swap 1.9.2`, `async-lock 3.4.2`, `atomic-waker 1.1.2`, `base64 0.22.1`, `base64 0.23.1`, `bitflags 2.13.1`, `bytes-utils 0.1.4`, `cfg-if 1.0.4`, `critical-section 1.2.0`, `crossbeam-channel 0.5.16`, `crossbeam-epoch 0.9.20`, `crossbeam-queue 0.3.13`, `crossbeam-utils 0.8.22`, `curve25519-dalek-derive 0.1.1`, `displaydoc 0.2.7`, `either 1.18.0`, `equivalent 1.0.2`, `errno 0.3.14`, `event-listener-strategy 0.5.4`, `event-listener 5.4.2`, `evmap 11.0.0`, `fastrand 2.5.0`, `flate2 1.1.10`, `fnv 1.0.7`, `form_urlencoded 1.2.2`, `futures-timer 3.0.4`, `gethostname 1.1.0`, `group 0.13.0`, `hashbrown 0.14.5`, `hashbrown 0.16.1`, `hashbrown 0.17.1`, `hashify 0.2.9`, `heck 0.5.0`, `httparse 1.10.1`, `hyper-rustls 0.24.2`, `hyper-rustls 0.27.9`, `idna 1.1.0`, `idna_adapter 1.2.2`, `indexmap 2.14.0`, `lazy_static 1.5.0`, `left-right 0.11.8`, `linux-raw-sys 0.12.1`, `lock_api 0.4.14`, `log 0.4.34`, `mail-auth 0.12.1`, `mail-builder 0.4.4`, `mail-builder 0.5.0`, `mail-parser 0.11.9`, `mime 0.3.17`, `num-bigint-dig 0.8.6`, `num-bigint 0.5.1`, `num-integer 0.1.47`, `num-iter 0.1.46`, `num-traits 0.2.19`, `once_cell 1.21.4`, `openssl-probe 0.2.1`, `parking 2.2.1`, `parking_lot 0.12.5`, `parking_lot_core 0.9.12`, `percent-encoding 2.3.2`, `regex-automata 0.4.18`, `regex-lite 0.1.9`, `regex-syntax 0.8.11`, `regex 1.13.1`, `ring 0.17.14`, `rustix 1.1.4`, `rustls-native-certs 0.8.4`, `rustls-pemfile 2.2.0`, `rustls 0.21.12`, `rustls 0.23.45`, `scopeguard 1.2.0`, `sct 0.7.1`, `signal-hook-registry 1.4.8`, `similar 3.2.0`, `smallvec 1.15.2`, `socket2 0.5.10`, `socket2 0.6.5`, `stable_deref_trait 1.2.1`, `thread_local 1.1.10`, `unicase 2.9.0`, `unicode-bidi 0.3.18`, `unicode-normalization 0.1.25`, `unicode-properties 0.1.4`, `url 2.5.8`, `uuid 1.26.1`, `xmlparser 0.13.6`
+Used by `arc-swap 1.9.2`, `async-lock 3.4.2`, `atomic-waker 1.1.2`, `base64 0.22.1`, `base64 0.23.1`, `bitflags 2.13.1`, `bytes-utils 0.1.4`, `cfg-if 1.0.4`, `critical-section 1.2.0`, `crossbeam-channel 0.5.16`, `crossbeam-epoch 0.9.20`, `crossbeam-queue 0.3.13`, `crossbeam-utils 0.8.22`, `curve25519-dalek-derive 0.1.1`, `displaydoc 0.2.7`, `either 1.18.0`, `equivalent 1.0.2`, `errno 0.3.14`, `event-listener-strategy 0.5.4`, `event-listener 5.4.2`, `evmap 11.0.0`, `fastrand 2.5.0`, `flate2 1.1.10`, `fnv 1.0.7`, `form_urlencoded 1.2.2`, `futures-timer 3.0.4`, `gethostname 1.1.0`, `group 0.13.0`, `hashbrown 0.14.5`, `hashbrown 0.16.1`, `hashbrown 0.17.1`, `hashify 0.2.9`, `heck 0.5.0`, `httparse 1.10.1`, `hyper-rustls 0.24.2`, `hyper-rustls 0.27.9`, `idna 1.1.0`, `idna_adapter 1.2.2`, `indexmap 2.14.0`, `lazy_static 1.5.0`, `left-right 0.11.8`, `linux-raw-sys 0.12.1`, `lock_api 0.4.14`, `log 0.4.34`, `mail-auth 0.13.3`, `mail-builder 1.0.0`, `mail-parser 0.11.9`, `mime 0.3.17`, `num-bigint-dig 0.8.6`, `num-bigint 0.5.1`, `num-integer 0.1.47`, `num-iter 0.1.46`, `num-traits 0.2.19`, `once_cell 1.21.4`, `openssl-probe 0.2.1`, `parking 2.2.1`, `parking_lot 0.12.5`, `parking_lot_core 0.9.12`, `percent-encoding 2.3.2`, `regex-automata 0.4.18`, `regex-lite 0.1.9`, `regex-syntax 0.8.11`, `regex 1.13.1`, `ring 0.17.14`, `rustix 1.1.4`, `rustls-native-certs 0.8.4`, `rustls-pemfile 2.2.0`, `rustls 0.21.12`, `rustls 0.23.45`, `scopeguard 1.2.0`, `sct 0.7.1`, `signal-hook-registry 1.4.8`, `similar 3.2.0`, `smallvec 1.15.2`, `socket2 0.5.10`, `socket2 0.6.5`, `stable_deref_trait 1.2.1`, `thread_local 1.1.10`, `unicase 2.9.0`, `unicode-bidi 0.3.18`, `unicode-normalization 0.1.25`, `unicode-properties 0.1.4`, `url 2.5.8`, `uuid 1.26.1`, `xmlparser 0.13.6`
 
 ```
                               Apache License
@@ -13344,6 +13344,37 @@ SOFTWARE.
 
 ## MIT License
 
+Used by `quick-xml 0.42.0`
+
+```
+The MIT License (MIT)
+
+Copyright (c) 2016 Johann Tuffe
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the &quot;Software&quot;), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+
+THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+```
+
+## MIT License
+
 Used by `nu-ansi-term 0.50.3`
 
 ```
@@ -13428,37 +13459,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-```
-
-## MIT License
-
-Used by `quick-xml 0.41.0`
-
-```
-The MIT License (MIT)
-
-Copyright (c) 2016 Johann Tuffe
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the &quot;Software&quot;), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-
-THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
 ```
 
 ## MIT License

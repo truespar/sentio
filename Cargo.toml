@@ -70,8 +70,8 @@ webpki-roots = "1"
 
 # Email parsing and auth
 mail-parser = "0.11.2"
-mail-auth = { version = "0.12", features = ["arc"] }
-mail-builder = "0.5"
+mail-auth = { version = "0.13", features = ["arc"] }
+mail-builder = "1.0"
 
 # Networking
 ipnetwork = "0.21"
