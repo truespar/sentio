@@ -76,7 +76,7 @@ jobs:
         env:
           DIGEST: ${{ steps.build.outputs.digest }}
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: digests-${{ steps.prep.outputs.arch }}
           path: /tmp/digests/*
@@ -115,7 +115,7 @@ jobs:
           }
           Get-ChildItem dist
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: windows-binary
           path: dist/*.zip
