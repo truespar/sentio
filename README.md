@@ -913,30 +913,51 @@ cheap ones could not decide:
    `score_llm_review_max`, 4.0-6.0 by default), so clear ham and clear spam
    never reach a model.
 
-Four backends serve that third tier. Anthropic, OpenAI and Ollama classify a
-message into a category. **TypeSafe Jev** (`provider = "jev"`) is a
-structured-decision model: it answers typed questions with calibrated
-probabilities rather than prose, so it is the only backend that also adjusts
-the spam score. A confident verdict moves a borderline message clear of the
-band in either direction; an unconfident one is discarded rather than applied
-weakly. Being decision-only, it cannot write replies, so pairing it with
-`auto_respond` is refused at startup.
+Four backends serve that third tier: Anthropic, OpenAI and Ollama label the
+message, and TypeSafe Jev also moves the score.
 
-`body_mode` decides how much of a message leaves your server - `"none"`
-(envelope and subject), `"preview"` (a bounded slice, the default) or
-`"full"`. See `[llm.jev]` in [`config/oss.toml`](config/oss.toml) for the
-weights, confidence floor and retry budget.
+### TypeSafe Jev
 
-Know what you are taking on before enabling it. Jev is closed-weight and
-hosted only: there is no published weight file, parameter count or self-host
-path, so unlike the Ollama backend you cannot run it yourself. During
-development the service returned 429, 500, 503 and 529 - two of those
-undocumented - so the provider retries transient statuses with exponential
-backoff, and a failed classification is logged and skipped rather than
-allowed to affect delivery. `base_url` is configurable if you would rather
-reach the model through a gateway, or point at a compatible endpoint of your
-own; neither is tested here. All of which is why the whole tier is opt-in and
-the default provider is not Jev.
+Jev is a structured-decision model - typed questions in, calibrated
+probabilities out, no prose. It is the only backend that adjusts the spam
+score rather than just labelling the message, so a confident verdict moves a
+borderline one clear of the review band in either direction. An unconfident
+verdict is dropped rather than applied weakly.
+
+```toml
+[llm]
+enabled = true
+provider = "jev"
+model = "jev-latest"
+base_url = ""               # empty means api.typesafe.ai
+api_key_env = "SENTIO_JEV_API_KEY"
+temperature = 0.3           # unused by Jev, but the section requires it
+max_input_tokens = 2000
+classify_inbound = true
+classify_outbound = false
+auto_respond = false        # required: Jev emits no text, so pairing it
+                            # with auto_respond is refused at startup
+```
+
+About 660 input tokens per message and output is free, so roughly **$0.03 per
+thousand messages** at current pricing.
+
+How much of a message leaves your server is your choice:
+
+| `[llm.jev]` `body_mode` | What is sent |
+|---|---|
+| `"none"` | Envelope and subject only |
+| `"preview"` | Subject plus the first `preview_tokens` of the body (default) |
+| `"full"` | Subject plus up to `max_body_tokens` |
+
+Two things to weigh before switching it on. Jev is closed-weight and hosted
+only, so unlike Ollama you cannot run it yourself. And it was unreliable in
+testing - 429, 500, 503 and 529, two of which are undocumented - so transient
+failures retry with exponential backoff, and a classification that still
+fails is logged and skipped rather than affecting delivery.
+
+Scoring weights, the confidence floor and the retry budget live in
+`[llm.jev]` in [`config/oss.toml`](config/oss.toml).
 
 **Standards.** Core SMTP (RFC 5321/5322 and the ESMTP extensions), transport
 security (STARTTLS, MTA-STS, DANE, TLS-RPT), authentication (SASL, DKIM, SPF,
