@@ -950,12 +950,6 @@ How much of a message leaves your server is your choice:
 | `"preview"` | Subject plus the first `preview_tokens` of the body (default) |
 | `"full"` | Subject plus up to `max_body_tokens` |
 
-Two things to weigh before switching it on. Jev is closed-weight and hosted
-only, so unlike Ollama you cannot run it yourself. And it was unreliable in
-testing - 429, 500, 503 and 529, two of which are undocumented - so transient
-failures retry with exponential backoff, and a classification that still
-fails is logged and skipped rather than affecting delivery.
-
 Scoring weights, the confidence floor and the retry budget live in
 `[llm.jev]` in [`config/oss.toml`](config/oss.toml).
 
