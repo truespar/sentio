@@ -79,10 +79,16 @@ impl JevProvider {
                 .timeout(REQUEST_TIMEOUT)
                 .build()
                 .map_err(|e| SentioError::Internal(format!("could not build HTTP client: {e}")))?,
+            // config/oss.toml ships `base_url = ""`, which deserializes to
+            // Some("") rather than None. Treating that as a value produced a
+            // relative URL and every request died in the builder before it
+            // reached the network.
             base_url: config
                 .base_url
-                .clone()
-                .unwrap_or_else(|| DEFAULT_BASE_URL.to_string())
+                .as_deref()
+                .map(str::trim)
+                .filter(|s| !s.is_empty())
+                .unwrap_or(DEFAULT_BASE_URL)
                 .trim_end_matches('/')
                 .to_string(),
             model,
@@ -224,10 +230,15 @@ impl JevProvider {
             .send()
             .await
             .map_err(|e| {
-                // A connection-level failure is worth one more try.
-                TransientOrFinal::Transient(SentioError::Internal(format!(
-                    "jev request failed: {e}"
-                )))
+                let err = SentioError::Internal(format!("jev request failed: {e}"));
+                // A builder error means the request was never sent - a bad URL,
+                // say - and will fail identically forever. Only reaching the
+                // network and failing there is worth another attempt.
+                if e.is_builder() {
+                    TransientOrFinal::Final(err)
+                } else {
+                    TransientOrFinal::Transient(err)
+                }
             })?;
 
         let status = resp.status().as_u16();
@@ -749,6 +760,58 @@ mod tests {
 
     /// The undocumented statuses are the ones actually seen in the wild, so
     /// pin which codes retry and which do not.
+    /// `config/oss.toml` ships `base_url = ""`. Read as a value rather than as
+    /// absent, it built a relative URL and every live call failed in the
+    /// request builder - which no mocked test caught, because they all pass a
+    /// real URL.
+    #[test]
+    fn an_empty_base_url_means_use_the_default() {
+        std::env::set_var("SENTIO_TEST_JEV_KEY", "test-key");
+        for given in [Some(""), Some("   "), None] {
+            let mut cfg = config("unused");
+            cfg.base_url = given.map(str::to_string);
+            let p = JevProvider::new(&cfg).unwrap();
+            assert_eq!(
+                p.base_url, DEFAULT_BASE_URL,
+                "base_url {given:?} should fall back to the default"
+            );
+        }
+    }
+
+    #[test]
+    fn a_trailing_slash_does_not_double_up() {
+        std::env::set_var("SENTIO_TEST_JEV_KEY", "test-key");
+        let mut cfg = config("unused");
+        cfg.base_url = Some("https://example.test/".to_string());
+        let p = JevProvider::new(&cfg).unwrap();
+        assert_eq!(p.base_url, "https://example.test");
+    }
+
+    /// A relative base URL cannot ever work, so it must fail once rather than
+    /// burning the whole retry budget on every message.
+    #[tokio::test]
+    async fn a_request_that_cannot_be_built_is_not_retried() {
+        std::env::set_var("SENTIO_TEST_JEV_KEY", "test-key");
+        let mut cfg = config("unused");
+        cfg.base_url = Some("not-a-url".to_string());
+        cfg.jev.max_attempts = 3;
+        let p = JevProvider::new(&cfg).unwrap();
+
+        let started = std::time::Instant::now();
+        let err = p
+            .classify("Subject: x\r\n\r\ny", "a@b.test", "c@d.test")
+            .await
+            .unwrap_err();
+        let elapsed = started.elapsed();
+
+        assert!(err.to_string().contains("jev request failed"));
+        // Retrying three times would have slept ~900ms first.
+        assert!(
+            elapsed < Duration::from_millis(250),
+            "a builder error was retried: took {elapsed:?}"
+        );
+    }
+
     #[test]
     fn transient_covers_the_statuses_observed_not_just_the_documented_ones() {
         // Documented as retryable.
