@@ -908,21 +908,30 @@ cheap ones could not decide:
    limits, DNSBL lookups, greylisting, reputation scoring, reverse DNS.
 2. **Content scoring**, tens of milliseconds - rspamd or the built-in engine:
    Bayesian classification, fuzzy hashes, URL reputation, header heuristics.
-3. **LLM tiebreak**, borderline scores only - `classifier.rs` skips any message
-   scoring outside the configurable review band (`score_llm_review_min`..
-   `score_llm_review_max`, 4.0-6.0 by default), so clear ham and clear spam
-   never reach a model.
+3. **LLM labelling**, opt-in per inbound route - a route with
+   `llm_classify = true` has its messages labelled by the configured backend.
+   A score-band helper exists (`classifier.rs`, `score_llm_review_min`..
+   `score_llm_review_max`) to consult a model only for borderline scores, but
+   nothing calls it yet, so labelling today depends on the route rather than
+   on the score.
 
-Four backends serve that third tier: Anthropic, OpenAI and Ollama label the
-message, and TypeSafe Jev also moves the score.
+Four backends serve that third tier: Anthropic, OpenAI, Ollama and TypeSafe
+Jev. Each one labels the message; the spam score itself is not changed.
 
 ### TypeSafe Jev
 
 Jev is a structured-decision model - typed questions in, calibrated
-probabilities out, no prose. It is the only backend that adjusts the spam
-score rather than just labelling the message, so a confident verdict moves a
-borderline one clear of the review band in either direction. An unconfident
-verdict is dropped rather than applied weakly.
+probabilities out, no prose. It labels a message with a category and, unlike
+the chat backends, also returns how likely it is to be unsolicited bulk and
+how likely it is to be phishing, each with the model's own confidence.
+
+Those land on the message as `llm_category` and `llm_summary` and travel with
+the webhook payload, so a consumer can act on them:
+
+```
+phishing message  ->  threat,  unsolicited=0.84, phishing=0.88
+ordinary message  ->  support, unsolicited=0.16, phishing=0.13
+```
 
 ```toml
 [llm]
@@ -950,8 +959,10 @@ How much of a message leaves your server is your choice:
 | `"preview"` | Subject plus the first `preview_tokens` of the body (default) |
 | `"full"` | Subject plus up to `max_body_tokens` |
 
-Scoring weights, the confidence floor and the retry budget live in
-`[llm.jev]` in [`config/oss.toml`](config/oss.toml).
+The confidence floor and retry budget live in `[llm.jev]` in
+[`config/oss.toml`](config/oss.toml), alongside weights for turning those two
+probabilities into a spam-score adjustment. The adjustment is computed and
+returned, but nothing applies it to a delivery decision yet.
 
 **Standards.** Core SMTP (RFC 5321/5322 and the ESMTP extensions), transport
 security (STARTTLS, MTA-STS, DANE, TLS-RPT), authentication (SASL, DKIM, SPF,

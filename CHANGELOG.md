@@ -12,10 +12,12 @@ reaches 1.0.
 ### Added
 - TypeSafe Jev as a fourth classification backend (`llm.provider = "jev"`). A
   structured-decision model: typed questions in, calibrated probabilities out.
-  It is the first provider that returns a real `score_delta` - the three chat
-  providers all left the spam score untouched - so a confident verdict moves a
-  borderline message clear of the review band. `llm.jev.body_mode` decides
-  whether the envelope, a bounded preview or the full body leaves the server.
+  It labels a message with a category and, unlike the chat backends, also
+  returns how likely it is to be unsolicited bulk and how likely it is to be
+  phishing. Both land on the message row and the webhook payload. It also
+  computes a spam-score adjustment from those probabilities, which nothing
+  applies to a delivery decision yet. `llm.jev.body_mode` decides whether the
+  envelope, a bounded preview or the full body leaves the server.
 - `scripts/check.sh`, which runs every check that has to pass before a change
   lands: formatting, clippy, tests, release build, `cargo deny`, the
   third-party notices diff and the OpenAPI spec diff.

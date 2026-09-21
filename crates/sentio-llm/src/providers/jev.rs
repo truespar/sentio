@@ -13,9 +13,11 @@
 //! cannot write a reply, so this provider implements `MessageClassifier` only -
 //! see the config validation that refuses `auto_respond` with this provider.
 //!
-//! The calibrated probability is what makes this provider able to return a real
-//! `score_delta`. The chat providers classify into a category and leave the
-//! spam score untouched.
+//! The calibrated probability lets this provider compute a real `score_delta`,
+//! where the chat providers all return 0.0. Note that nothing consumes it yet:
+//! `routing.rs` reads only the category and summary, and
+//! `classifier::classify_if_borderline` - which would apply the delta - has no
+//! callers outside its own tests. The value is correct; the wiring is missing.
 //!
 //! API: `POST {base_url}/v1/systemone`, bearer auth.
 
