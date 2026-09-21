@@ -53,12 +53,12 @@ impl From<SmtpCredentialRecord> for SmtpCredentialResponse {
 // ──────────────────────────────────────────────────────────────────────────────
 
 fn hash_password(password: &str) -> Result<String, ApiError> {
-    use argon2::password_hash::SaltString;
     use argon2::PasswordHasher;
 
-    let salt = SaltString::generate(&mut argon2::password_hash::rand_core::OsRng);
+    // argon2 0.6 draws the salt itself (via the default getrandom feature), so
+    // there is no SaltString to build here any more.
     argon2::Argon2::default()
-        .hash_password(password.as_bytes(), &salt)
+        .hash_password(password.as_bytes())
         .map(|h| h.to_string())
         .map_err(|e| ApiError::Internal(format!("password hashing failed: {e}")))
 }

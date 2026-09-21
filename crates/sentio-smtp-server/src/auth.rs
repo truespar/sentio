@@ -636,7 +636,7 @@ async fn verify_credentials(
 }
 
 fn verify_argon2(hash: &str, password: &str) -> bool {
-    use argon2::password_hash::PasswordHash;
+    use argon2::password_hash::phc::PasswordHash;
     use argon2::PasswordVerifier;
 
     let parsed = match PasswordHash::new(hash) {
@@ -696,12 +696,10 @@ mod tests {
     }
 
     fn test_record(password: &str) -> SmtpCredentialRecord {
-        use argon2::password_hash::SaltString;
         use argon2::PasswordHasher;
 
-        let salt = SaltString::generate(&mut argon2::password_hash::rand_core::OsRng);
         let hash = argon2::Argon2::default()
-            .hash_password(password.as_bytes(), &salt)
+            .hash_password(password.as_bytes())
             .unwrap()
             .to_string();
 
@@ -893,14 +891,24 @@ mod tests {
         assert!(result.is_err());
     }
 
+    /// A hash produced by argon2 0.5 (captured from a running 0.1.5 instance)
+    /// must still verify after the 0.6 upgrade. The PHC string format did not
+    /// change, but if it ever does, every stored SMTP credential stops working
+    /// and this is the test that says so.
+    #[test]
+    fn hashes_written_by_argon2_0_5_still_verify() {
+        let legacy = "$argon2id$v=19$m=19456,t=2,p=1$\
+                      Qp5c/49XCNUlVTcawe3Rmg$6YHDvIwIXeqisyVurvqN+uI7FaeEIA+deFlPZRvVF6c";
+        assert!(verify_argon2(legacy, "OldHashPassword123"));
+        assert!(!verify_argon2(legacy, "wrong"));
+    }
+
     #[test]
     fn argon2_verify_works() {
-        use argon2::password_hash::SaltString;
         use argon2::PasswordHasher;
 
-        let salt = SaltString::generate(&mut argon2::password_hash::rand_core::OsRng);
         let hash = argon2::Argon2::default()
-            .hash_password(b"test_password", &salt)
+            .hash_password(b"test_password")
             .unwrap()
             .to_string();
 

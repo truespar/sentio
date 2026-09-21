@@ -1737,11 +1737,9 @@ mod tests {
         use base64::engine::general_purpose::STANDARD as B64;
         use base64::Engine;
         let record = {
-            use argon2::password_hash::SaltString;
             use argon2::PasswordHasher;
-            let salt = SaltString::generate(&mut argon2::password_hash::rand_core::OsRng);
             let hash = argon2::Argon2::default()
-                .hash_password(b"secret", &salt)
+                .hash_password(b"secret")
                 .unwrap()
                 .to_string();
             sentio_core::traits::SmtpCredentialRecord {
