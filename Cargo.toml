@@ -86,8 +86,8 @@ tower-http = "0.7"
 reqwest = { version = "0.13", features = ["json", "query"] }
 
 # OpenAPI documentation
-utoipa = { version = "5", features = ["chrono", "uuid"] }
-utoipa-scalar = { version = "0.3", features = ["axum"] }
+utoipa = { version = "6", features = ["chrono", "uuid"] }
+utoipa-scalar = { version = "0.4", features = ["axum"] }
 # The /docs front-end bundle is embedded gzipped; this inflates it for
 # clients that do not accept gzip.
 flate2 = "1"
