@@ -323,20 +323,26 @@ async fn main() {
             }
         });
 
-    let pipeline = Arc::new(sentio_smtp_server::InboundPipeline::with_verp(
-        pipeline_blob_store,
-        virus_scanner,
-        message_repo,
-        event_repo,
-        domain_repo,
-        pipeline_publisher,
-        spam_scorer,
-        attachment_repo,
-        authenticator,
-        mailbox_repo,
-        pipeline_verp_codec,
-    ));
-    tracing::info!("InboundPipeline initialized (virus scanner: ClamAV, spam scorer: rspamd)");
+    let pipeline = Arc::new(
+        sentio_smtp_server::InboundPipeline::with_verp(
+            pipeline_blob_store,
+            virus_scanner,
+            message_repo,
+            event_repo,
+            domain_repo,
+            pipeline_publisher,
+            spam_scorer,
+            attachment_repo,
+            authenticator,
+            mailbox_repo,
+            pipeline_verp_codec,
+        )
+        .with_dmarc_reject(config.auth.dmarc_check_inbound),
+    );
+    tracing::info!(
+        dmarc_reject = config.auth.dmarc_check_inbound,
+        "InboundPipeline initialized (virus scanner: ClamAV, spam scorer: rspamd)"
+    );
 
     // ── Outbound Delivery Engine ──────────────────────────────────────────
     let delivery_suppression_repo = Arc::new(sentio_store::postgres::PgSuppressionRepository::new(

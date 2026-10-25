@@ -7,6 +7,14 @@ reaches 1.0.
 
 ## [Unreleased]
 
+### Fixed
+- `[auth] dmarc_check_inbound = false` was parsed and ignored: a DMARC `fail`
+  under `p=reject` was always answered with 550. The flag now turns that
+  rejection off; DMARC is still evaluated and recorded in
+  Authentication-Results. It matters on an MX that receives forwarded mail,
+  where the forwarding hop breaks SPF. `spf_check_inbound` is documented as
+  having no effect: SPF never rejected on its own.
+
 ## [0.2.0] - 2026-10-17
 
 A security release. Three of its changes are breaking for an existing

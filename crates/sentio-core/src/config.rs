@@ -709,7 +709,12 @@ pub struct AuthConfig {
     pub dkim_default_selector: String,
     pub dkim_algorithm: String,
     pub dkim_rsa_key_bits: u32,
+    /// Not read. SPF is always evaluated inbound, because DMARC needs it, and
+    /// is recorded in Authentication-Results; it never rejects on its own.
     pub spf_check_inbound: bool,
+    /// Reject inbound mail that fails DMARC under `p=reject` with 550. When
+    /// `false` DMARC is still evaluated and recorded in
+    /// Authentication-Results, but the message is accepted.
     pub dmarc_check_inbound: bool,
     pub arc_sign_forward: bool,
     pub mta_sts_cache_secs: u64,

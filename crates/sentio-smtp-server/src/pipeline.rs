@@ -290,6 +290,10 @@ pub struct InboundPipeline<B, V, M, E, D, Q, S, A, Mb> {
     /// so a misconfigured instance silently degrades to today's behaviour
     /// rather than blackholing bounces.
     verp_codec: Option<Arc<VerpCodec>>,
+    /// Answer a DMARC `fail` under `p=reject` with 550. When `false` the
+    /// result is still evaluated and recorded in Authentication-Results;
+    /// only the SMTP-time rejection is skipped.
+    dmarc_reject: bool,
 }
 
 impl<B, V, M, E, D, Q, S, A, Mb> InboundPipeline<B, V, M, E, D, Q, S, A, Mb>
@@ -361,7 +365,18 @@ where
             authenticator,
             mailbox_repo,
             verp_codec,
+            dmarc_reject: true,
         }
+    }
+
+    /// Whether a DMARC `fail` under `p=reject` is rejected with 550 (the
+    /// default). Wired to `[auth] dmarc_check_inbound`. Turning it off is for
+    /// an MX that receives forwarded mail: the forwarding hop breaks SPF, so
+    /// a sender with `p=reject` and no aligned DKIM signature fails DMARC
+    /// through no fault of its own.
+    pub fn with_dmarc_reject(mut self, enabled: bool) -> Self {
+        self.dmarc_reject = enabled;
+        self
     }
 
     /// If any recipient looks like a VERP bounce return-path
@@ -748,7 +763,7 @@ where
                 sentio_auth::DkimVerifyOutput { signatures: vec![] }
             });
 
-        // 5. DMARC check (reject if policy=reject + fail)
+        // 5. DMARC check (reject if policy=reject + fail, unless disabled)
         let dmarc_output = self
             .authenticator
             .verify_dmarc(&from_domain, &spf_output.domain, &dkim_output, &spf_output)
@@ -768,7 +783,13 @@ where
         if dmarc_output.result == DmarcVerifyResult::Fail
             && dmarc_output.policy == DmarcPolicy::Reject
         {
-            return Err(ProcessingError::dmarc_reject(&dmarc_output.domain));
+            if self.dmarc_reject {
+                return Err(ProcessingError::dmarc_reject(&dmarc_output.domain));
+            }
+            info!(
+                domain = %dmarc_output.domain,
+                "DMARC p=reject failure accepted: dmarc_check_inbound is off"
+            );
         }
 
         // 5b. Generate IDs early so queue_id can appear in the Received header
@@ -2401,6 +2422,49 @@ Test body.\r\n"
             }
             other => panic!("expected DMARC Reject(550 5.7.1), got: {other:?}"),
         }
+    }
+
+    #[tokio::test]
+    async fn dmarc_reject_disabled_accepts_and_records() {
+        // Same message as dmarc_reject_returns_550, with the rejection
+        // turned off: accepted, and the failure still reaches the stored
+        // Authentication-Results.
+        let blob_store = MockBlobStore::new();
+        let pipeline = InboundPipeline::new(
+            blob_store.clone(),
+            MockScanner::new(),
+            MockMessageRepo::new(),
+            MockEventRepo::new(),
+            MockDomainRepo::with_domain(),
+            MockPublisher::new(),
+            MockSpamScorer::new(),
+            MockAttachmentRepo::new(),
+            test_authenticator(),
+            MockMailboxRepo,
+        )
+        .with_dmarc_reject(false);
+
+        let mut msg = test_inbound_msg();
+        msg.raw_data = b"From: sender@example.com\r\n\
+To: rcpt@test.invalid\r\n\
+Subject: DMARC test\r\n\
+Date: Thu, 01 Jan 2025 00:00:00 +0000\r\n\
+Message-ID: <dmarc-test@test.invalid>\r\n\
+\r\n\
+Test body.\r\n"
+            .to_vec();
+        msg.envelope_from = "sender@example.com".into();
+
+        let result = pipeline.process(msg).await;
+        assert!(result.is_ok(), "expected Ok, got: {result:?}");
+
+        // The raw EML is the first blob assigned.
+        let raw = blob_store.download("1,00000001").await.unwrap();
+        let raw = String::from_utf8_lossy(&raw);
+        assert!(
+            raw.contains("dmarc=fail (p=reject) header.from=example.com"),
+            "Authentication-Results should record the DMARC failure:\n{raw}"
+        );
     }
 
     #[tokio::test]

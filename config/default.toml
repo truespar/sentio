@@ -188,7 +188,13 @@ tls_mode = "none"
 dkim_default_selector = "sentio"
 dkim_algorithm = "ed25519"
 dkim_rsa_key_bits = 2048
+# SPF is always evaluated inbound (DMARC needs it) and recorded in
+# Authentication-Results. It never rejects on its own, so this flag has no
+# effect today.
 spf_check_inbound = true
+# Reject with 550 when DMARC fails under p=reject. false still evaluates and
+# records DMARC but accepts the message: for an MX that receives forwarded
+# mail, where the forwarding hop breaks SPF.
 dmarc_check_inbound = true
 arc_sign_forward = true
 mta_sts_cache_secs = 86400
