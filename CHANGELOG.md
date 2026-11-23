@@ -7,6 +7,14 @@ reaches 1.0.
 
 ## [Unreleased]
 
+### Fixed
+- LLM classification was given the message body without its subject. The Jev
+  provider takes everything up to the first blank line for headers, so it never
+  saw the subject or the first paragraph, and a message of one paragraph
+  reached it empty. Routing now passes the subject line, a blank line and the
+  body, so the chat providers see the subject too. A message with a subject and
+  no body is classified on its subject instead of being skipped.
+
 ## [0.2.0] - 2026-10-17
 
 A security release. Three of its changes are breaking for an existing

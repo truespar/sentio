@@ -106,6 +106,31 @@ pub fn match_route<'a>(
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
+// Classifier input
+// ──────────────────────────────────────────────────────────────────────────────
+
+/// What an LLM backend reads of a message: the subject as a header line, a
+/// blank line, then the plain-text body.
+///
+/// The Jev provider splits its input at the first blank line and takes what
+/// comes before it for headers, so a bare body would lose its subject and its
+/// first paragraph there. An encoded subject can decode to line breaks, which
+/// would end the header part early, so it is kept on one line.
+///
+/// Empty when the message has neither, so there is nothing to classify.
+fn classifier_text(message: &mail_parser::Message<'_>) -> String {
+    let subject = message
+        .subject()
+        .unwrap_or_default()
+        .replace(['\r', '\n'], " ");
+    let body = message.body_text(0).unwrap_or_default();
+    if subject.is_empty() && body.is_empty() {
+        return String::new();
+    }
+    format!("Subject: {subject}\r\n\r\n{body}")
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
 // Inbound routing engine - implements MessageHandler
 // ──────────────────────────────────────────────────────────────────────────────
 
@@ -450,13 +475,11 @@ where
             // ── LLM content classification ─────────────────────────────
             // Runs before webhook so consumers receive enriched payload
             if route.llm_classify && self.llm_config.enabled && self.llm_config.classify_inbound {
-                // Download raw EML and extract plain text for LLM
+                // Download raw EML and extract subject and plain text for LLM
                 let message_text = match self.blob_store.download(&payload.raw_eml_key).await {
                     Ok(eml_bytes) => {
                         let parsed = mail_parser::MessageParser::default().parse(&eml_bytes);
-                        parsed
-                            .and_then(|m| m.body_text(0).map(|t| t.to_string()))
-                            .unwrap_or_default()
+                        parsed.map(|m| classifier_text(&m)).unwrap_or_default()
                     }
                     Err(e) => {
                         warn!(error = %e, "failed to download EML for LLM classification, skipping");
@@ -928,6 +951,61 @@ mod engine_tests {
     use sentio_llm::LlmBackend;
     use sentio_queue::consumer::{HandlerResult, MessageHandler, MessageHeaders, QueueMessage};
     use std::sync::{Arc, Mutex};
+
+    // ── classifier_text ──────────────────────────────────────────────────
+
+    fn classifier_text_of(eml: &str) -> String {
+        let message = mail_parser::MessageParser::default().parse(eml).unwrap();
+        classifier_text(&message)
+    }
+
+    #[test]
+    fn classifier_text_is_subject_blank_line_body() {
+        assert_eq!(
+            classifier_text_of("Subject: Hi\r\n\r\nFirst.\r\n\r\nSecond.\r\n"),
+            "Subject: Hi\r\n\r\nFirst.\r\n\r\nSecond.\r\n"
+        );
+    }
+
+    #[test]
+    fn classifier_text_reads_an_html_only_message() {
+        let text = classifier_text_of(
+            "Subject: Hi\r\nContent-Type: text/html\r\n\r\n<p>First.</p><p>Second.</p>\r\n",
+        );
+        assert!(text.starts_with("Subject: Hi\r\n\r\nFirst."), "{text:?}");
+        assert!(text.contains("Second."), "{text:?}");
+    }
+
+    /// Base64 of "One\r\n\r\nTwo": a blank line inside the subject would
+    /// otherwise push the rest of it, and the body, out of place.
+    #[test]
+    fn classifier_text_keeps_an_encoded_subject_on_one_line() {
+        assert_eq!(
+            classifier_text_of("Subject: =?utf-8?B?T25lDQoNClR3bw==?=\r\n\r\nBody.\r\n"),
+            "Subject: One    Two\r\n\r\nBody.\r\n"
+        );
+    }
+
+    #[test]
+    fn classifier_text_without_a_subject_keeps_the_body() {
+        assert_eq!(
+            classifier_text_of("From: a@b.test\r\n\r\nOnly paragraph.\r\n"),
+            "Subject: \r\n\r\nOnly paragraph.\r\n"
+        );
+    }
+
+    #[test]
+    fn classifier_text_without_a_body_keeps_the_subject() {
+        assert_eq!(
+            classifier_text_of("Subject: Hi\r\n\r\n"),
+            "Subject: Hi\r\n\r\n"
+        );
+    }
+
+    #[test]
+    fn classifier_text_without_subject_and_body_is_empty() {
+        assert_eq!(classifier_text_of("From: a@b.test\r\n\r\n"), "");
+    }
 
     // ── Mock InboundRouteRepository ──────────────────────────────────────
 
